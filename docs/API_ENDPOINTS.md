@@ -1,142 +1,25 @@
-# AI-Powered Document Chatbot API Documentation
+# API Specification
 
-This is the official API documentation for the **AI-Powered Document Chatbot** 
-web application built with FastAPI. The application allows users to upload 
-documents, ask questions in natural language, and receive intelligent answers 
-powered by RAG (Retrieval-Augmented Generation).
+## API Endpoints
 
----
+This document outlines the API endpoints for the DocuChat API, categorized by feature 
+domain. All routes are prefixed with `/api/v1/`.
 
-## 📌 Overview
-
-### 🔥 Core Features
-
-- JWT-based authentication
-- Chatbot sessions for different use cases
-- Document upload with file size & format validation
-- Document embedding & vector search (via FAISS)
-- Chat history per session
-- PDF/text export of entire conversations
-- Token usage tracking per user
-- RESTful API with FastAPI and async tasks
-
----
-
-## ⚙️ System Architecture
-
-**Frontend:** React.js  
-**Backend:** FastAPI (Python)  
-**Database:** PostgresSQL (users, sessions, metadata)  
-**Vector DB:** FAISS 
-**Storage:** Local or Cloud (S3, etc.)  
-**Auth:** JWT access & refresh tokens (cookie or header)  
-**Background Tasks:** Celery / FastAPI tasks  
-**LLM API:** OpenAI / Claude / Llama.cpp
-
----
-
-## 📁 Project Structure
-
-```cmd
-src/
-├── api/ # API routers (auth, sessions, chat, docs)
-├── core/ # Configs, startup, security
-├── models/ # Pydantic models (schemas)
-├── db/ # SQLAlchemy models, sessions
-├── services/ # Business logic (RAG, upload, chat)
-├── utils/ # File, text, embedding utils
-├── vectorstore/ # Embedding and similarity search logic
-├── background/ # Async tasks (embedding, cleanup)
-└── main.py # FastAPI app instance
-```
-
----
-
-## 🗄️ Database Models Overview
-
-### 🔐 User
-
-```cmd
-User {
-    id: UUID
-    username: str
-    email: str
-    hashed_password: str
-    plan: str  # free
-    total_tokens_used: int
-    created_at: datetime
-}
-```
-
-### 💬 Session
-
-```cmd
-ChatSession {
-    id: UUID
-    user_id: FK
-    title: str
-    description: str
-    created_at: datetime
-}
-```
-
-### 📎 Document
-
-```cmd
-Document {
-    id: UUID
-    session_id: FK -> ChatSession
-    user_id: FK -> User
-    filename: str
-    content: text
-    vector_id: str
-    tokens_used: int
-    created_at: datetime
-}
-```
-
-### 💬 Message
-
-```cmd
-ChatMessage {
-    id: UUID
-    session_id: FK
-    user_id: FK
-    role: enum (user, assistant)
-    content: text
-    token_count: int
-    created_at: datetime
-}
-```
-
-### 📊 Usage Stats
-
-```cmd
-UsageStats {
-    id: UUID
-    user_id: FK
-    daily_token_count: int
-    doc_count: int
-    session_count: int
-}
-```
-
----
-
-## 🔗 API Endpoints
-
-
-### 🧾 Auth & User
+### 🧾 Auth
 
 | Method | Endpoint         | Description                                  |
 |--------|------------------|----------------------------------------------|
 | POST   | `/auth/register` | Register a new user                          |
 | POST   | `/auth/login`    | Authenticate and receive JWT                 |
-| GET    | `/auth/me`       | Get current user details                     |
 | POST   | `/auth/logout`   | Log out user (optional token blacklist)      |
-| PATCH  | `/auth/update`   | Update user info (email, password, etc.)     |
-| GET    | `/auth/usage`    | Show token/doc upload usage for current user |
 
+### 🧾 User
+
+| Method | Endpoint       | Description                                  |
+|--------|----------------|----------------------------------------------|
+| GET    | `/user/me`     | Get current user details                     |
+| PATCH  | `/user/update` | Update user info (email, password, etc.)     |
+| GET    | `/user/usage`  | Show token/doc upload usage for current user |
 
 ### 💬 Chatbot Sessions
 
@@ -146,7 +29,7 @@ UsageStats {
 | POST   | `/sessions/`     | Create a new chatbot session            |
 | GET    | `/sessions/{id}` | Get details of a specific session       |
 | DELETE | `/sessions/{id}` | Delete a session and associated content |
-| PATCH  | `/sessions/{id}` | Rename or describe session              |
+| PATCH  | `/sessions/{id}` | Update session details                  |
 
 
 ### 📄 Document Management
@@ -179,7 +62,7 @@ UsageStats {
 ### 🔍 Search
 
 | Method | Endpoint                     | Description                    |
-| ------ | ---------------------------- | ------------------------------ |
+|--------|------------------------------|--------------------------------|
 | GET    | `/search/sessions?q=keyword` | Search session titles or notes |
 | GET    | `/search/messages?q=keyword` | Search through message content |
 
@@ -187,7 +70,7 @@ UsageStats {
 ### 📊 Dashboard & Usage
 
 | Method | Endpoint             | Description                               |
-| ------ | -------------------- | ----------------------------------------- |
+|--------|----------------------|-------------------------------------------|
 | GET    | `/dashboard/summary` | Summary of usage (sessions, tokens, etc.) |
 | GET    | `/dashboard/tokens`  | Token usage logs (daily, weekly, etc.)    |
 | GET    | `/dashboard/limits`  | Current plan limits and quotas            |
@@ -196,8 +79,7 @@ UsageStats {
 ### 🛠️ Admin (Optional)
 
 | Method | Endpoint                | Description                            |
-| ------ | ----------------------- | -------------------------------------- |
+|--------|-------------------------|----------------------------------------|
 | GET    | `/admin/users`          | View all registered users (admin only) |
 | GET    | `/admin/stats`          | View overall platform statistics       |
 | POST   | `/admin/users/{id}/ban` | Disable user account                   |
-

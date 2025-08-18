@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="Working on db connection">
+    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="refactor: reorganized project folder">
+      <change afterPath="$PROJECT_DIR$/tests/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/schemas/user_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/docs/API_DOCUMENTATION.md" beforeDir="false" afterPath="$PROJECT_DIR$/API_DOCUMENTATION.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/docs/API_DOCUMENTATION.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/API_DOCUMENTATION.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,19 +73,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "configurable.group.tools"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\maduk\Documents\Programming\Personal Projects\DocuChatAPI\docs" />
       <recent name="C:\Users\maduk\Documents\Programming\Personal Projects\DocuChatAPI" />
       <recent name="C:\Users\maduk\Documents\Programming\Personal Projects\DocuChatAPI\src\docs" />
     </key>
@@ -185,7 +187,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752540247225</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="refactor: reorganized project folder">
+      <option name="closed" value="true" />
+      <created>1755542815782</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1755542815782</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -207,6 +217,7 @@
     <MESSAGE value="Added the endpoint documentation" />
     <MESSAGE value="Put all the api documentation into one file for simplicity" />
     <MESSAGE value="Working on db connection" />
-    <option name="LAST_COMMIT_MESSAGE" value="Working on db connection" />
+    <MESSAGE value="refactor: reorganized project folder" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: reorganized project folder" />
   </component>
 </project>
