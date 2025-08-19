@@ -115,7 +115,7 @@ The project adheres to 3-tier architecture with a clean separation of concerns.
 
 5. Response: New session details (via schema) returned to the client.
 
-## Middleware Responsibilities
+## (Basic) Middleware Responsibilities
 
 - Authentication middleware: validates JWT tokens.
 
