@@ -115,13 +115,20 @@ The project adheres to 3-tier architecture with a clean separation of concerns.
 
 5. Response: New session details (via schema) returned to the client.
 
-## (Basic) Middleware Responsibilities
+## Middlewares
 
-- Authentication middleware: validates JWT tokens.
-
-- Error handling middleware: converts unhandled exceptions into proper HTTP responses.
-
-- Logging middleware: captures request/response cycles for debugging & monitoring.
+| Order | Middleware Type                    | Purpose                      |
+|-------|------------------------------------|------------------------------|
+| 1     | **Error Handling**                 | Standardize error responses  |
+| 2     | **Logging**                        | Track requests/responses     |
+| 3     | **CORS**                           | Handle cross-origin requests |
+| 4     | **Security Headers**               | Basic security               |
+| 5     | **Authentication & Authorization** | User access control          |
+| 6     | **Request Validation**             | Ensure clean data entry      |
+| 7     | **DB Session Lifecycle**           | Proper database handling     |
+| 8     | **Rate Limiting**                  | Prevent abuse                |
+| 9     | **Request Duration Tracking**      | Performance insights         |
+| 10    | **Response Compression / Caching** | Speed optimizations          |
 
 ## Modularity & Extensibility
 
