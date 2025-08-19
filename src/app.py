@@ -5,6 +5,8 @@ the application.
 
 from fastapi import FastAPI
 
+from src.middleware.exception_handler import setup_exception_handlers
+
 
 def create_app():
     """Create and configure the FastAPI application."""
@@ -13,7 +15,6 @@ def create_app():
 
     # Register routes
 
-    # Global error handling
-    # app.add_exception_handler(ApiException)
+    setup_exception_handlers(app)
 
     return app
