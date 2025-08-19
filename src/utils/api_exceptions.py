@@ -356,21 +356,16 @@ class DocumentNotFoundException(NotFoundException):
 
     def __init__(
         self,
-        document_id: Optional[str] = None,
         error_code: str = "DOCUMENT_NOT_FOUND",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "Document cannot be found.",
     ):
-        if not details and document_id:
-            details = f"Document with ID '{document_id}' not found."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_404_NOT_FOUND,
-            message="Document not found.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
 
 
@@ -381,21 +376,16 @@ class MessageNotFoundException(NotFoundException):
 
     def __init__(
         self,
-        message_id: Optional[str] = None,
         error_code: str = "MESSAGE_NOT_FOUND",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "Chat message cannot be found.",
     ):
-        if not details and message_id:
-            details = f"Message with ID '{message_id}' not found."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_404_NOT_FOUND,
-            message="Message not found.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
 
 
@@ -411,12 +401,10 @@ class DocumentUploadException(BadRequestException):
         stack_trace: Optional[str] = None,
         message: str = "Failed to upload document.",
     ):
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_400_BAD_REQUEST,
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
             message=message,
         )
 
@@ -428,21 +416,16 @@ class FileSizeException(BadRequestException):
 
     def __init__(
         self,
-        max_size: Optional[str] = None,
         error_code: str = "FILE_SIZE_EXCEEDED",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "File size limit exceeded.",
     ):
-        if not details and max_size:
-            details = f"File size exceeds maximum limit of {max_size}."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message="File size limit exceeded.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
 
 
@@ -453,25 +436,16 @@ class FileTypeException(BadRequestException):
 
     def __init__(
         self,
-        file_type: Optional[str] = None,
-        supported_types: Optional[str] = None,
         error_code: str = "UNSUPPORTED_FILE_TYPE",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "The file type is not supported",
     ):
-        if not details:
-            if file_type and supported_types:
-                details = f"File type '{file_type}' is not supported. Supported types: {supported_types}."
-            elif file_type:
-                details = f"File type '{file_type}' is not supported."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message="Unsupported file type.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
 
 
@@ -482,24 +456,16 @@ class QuotaExceededException(TooManyRequestsException):
 
     def __init__(
         self,
-        quota_type: str = "usage",
-        limit: Optional[str] = None,
         error_code: str = "QUOTA_EXCEEDED",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "Your quota has been exceeded.",
     ):
-        if not details:
-            details = f"Your {quota_type} quota has been exceeded."
-            if limit:
-                details += f" Limit: {limit}."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            message="Quota exceeded.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
 
 
@@ -515,12 +481,10 @@ class ChatbotException(InternalServerException):
         stack_trace: Optional[str] = None,
         message: str = "An error occurred while processing your request.",
     ):
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
             message=message,
         )
 
@@ -537,16 +501,11 @@ class DatabaseException(InternalServerException):
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
     ):
-        if not details:
-            details = f"Database {operation} failed."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Database error.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=f"Database {operation} failed.",
         )
 
 
@@ -557,21 +516,16 @@ class ExportException(InternalServerException):
 
     def __init__(
         self,
-        export_type: str = "data",
         error_code: str = "EXPORT_ERROR",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "Failed to export the data.",
     ):
-        if not details:
-            details = f"Failed to export {export_type}."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Export error.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
 
 
@@ -582,24 +536,16 @@ class ValidationException(UnprocessableEntityException):
 
     def __init__(
         self,
-        field: Optional[str] = None,
         error_code: str = "VALIDATION_ERROR",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "Data validation failed.",
     ):
-        if not details:
-            if field:
-                details = f"Validation failed for field '{field}'."
-            else:
-                details = "Data validation failed."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
-        )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            message="Validation error.",
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
 
 
@@ -610,25 +556,34 @@ class PermissionException(ForbiddenException):
 
     def __init__(
         self,
-        resource: Optional[str] = None,
-        action: Optional[str] = None,
         error_code: str = "PERMISSION_DENIED",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
+        message: str = "You do not have permission to perform this action.",
     ):
-        if not details:
-            if resource and action:
-                details = f"You do not have permission to {action} {resource}."
-            elif resource:
-                details = f"You do not have permission to access {resource}."
-            else:
-                details = "You do not have permission to perform this action."
-
-        error_detail = ErrorDetail(
-            code=error_code, details=details, stack_trace=stack_trace
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
-        super(ApiException, self).__init__(
-            error_detail=error_detail,
-            status_code=status.HTTP_403_FORBIDDEN,
-            message="Permission denied.",
+
+
+class AdminRequiredException(ForbiddenException):
+    """
+    Used when non-admin users attempt to access admin-only resources or endpoints.
+    """
+
+    def __init__(
+        self,
+        error_code: str = "ADMIN_REQUIRED",
+        details: Optional[str] = None,
+        stack_trace: Optional[str] = None,
+        message: str = "Administrator privileges are required to access this resource.",
+    ):
+        super().__init__(
+            error_code=error_code,
+            details=details,
+            stack_trace=stack_trace,
+            message=message,
         )
