@@ -1,24 +1,12 @@
-# Project Architecture – DocuChatAPI
-
----
+# DocuChatAPI Project Architecture
 
 ## Overview
 
-The **DocuChatAPI** is a modular **FastAPI-based Retrieval-Augmented Generation 
-(RAG) backend** designed to support user-managed chatbot sessions, document uploads, 
-and conversational interactions with vector-based retrieval.  
+This document describes the architecture of the DocuChat API project.
+The design follows modular principles, clean separation of concerns, and 3-tier 
+architecture:
 
-The system follows a **layered architecture**:
-
-- **API Layer** → Handles HTTP requests/responses.
-
-- **Service Layer** → Encapsulates business logic (sessions, documents, messaging). 
-
-- **Persistence Layer** → Manages database storage and vector embeddings. 
-
-- **AI Layer** → RAG pipeline (retrieval + LLM response).
-
-## High-Level Architecture
+`Model ➝ Service ➝ Controller`
 
 **Core Components:**
 
@@ -37,80 +25,117 @@ document search.
 - **LLM Integration (OpenAI / Local LLMs)** – Provides intelligent responses enhanced 
 by context retrieval.
 
-## Component Breakdown
+## Project Structure
 
-### 🔹 API Layer
+```commandline
+src/
+|── abstractions/           # Contains OOP abstractions/interfaces
+│── api/
+│   └── v1/
+│       ├── controllers/    # Handle API logic, orchestrate services
+│       ├── routes/         # Define API endpoints (FastAPI routers)
+│       └── __init__.py
+│
+│── config/                 # Configuration files (settings, environment, logging)
+│
+│── data/                   # Contains app data
+│
+│── database/
+│   ├── models/             # SQLModel classes (ORM representations of tables)
+│   ├── schemas/            # Pydantic schemas for request/response validation
+│   ├── db_connection.py    # Database connection & session management
+│   └── __init__.py
+│
+│── middleware/             # Custom middleware (auth, logging, error handling)
+│
+│── services/               # Business logic (interacts with models, external APIs)
+│
+│── swagger/                # (Later) OpenAPI/Swagger documentation extensions
+│
+│── utils/                  # Shared helpers (security, hashing, token management)
+│   └── __init__.py
+│
+│── vector/                  # Handles vector storage and access
+│
+│── app.py                  # FastAPI application factory
+│── server.py               # Entry point (runs the app with uvicorn/gunicorn)
+│
+tests/                      # Unit & integration tests
+```
 
-- **Routers** for `auth`, `users`, `sessions`, `documents`, `messages`, `usage`.  
-- **Dependencies**: Database session injection, authentication guards.  
+## Layered Architecture
 
-### 🔹 Service Layer
+The project adheres to 3-tier architecture with a clean separation of concerns.
 
-- **Session Service** – Creates chat sessions, enforces limits, retrieves history.  
-- **Document Service** – Handles file ingestion, text chunking, vector embedding.  
-- **Message Service** – Stores and retrieves chat messages.  
-- **Usage Service** – Tracks token usage, session count, and uploads.  
+| Layer          | Responsibility                                                                                                                                              |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Model**      | Defines data structures and database models (SQLModel ORM + Pydantic schemas). Handles data persistence logic through DataModel classes.                    |
+| **Service**    | Contains business rules and domain logic. Interacts with Models, enforces <br/> constraints (e.g., token limits, document caps), and coordinates workflows. |
+| **Controller** | Orchestrates services in response to API requests. Maps request/response to schemas, handles errors, and returns standardized responses.                    |
 
-### 🔹 Persistence Layer
+## Authentication & Authorization
 
-- **SQLModel ORM** – Defines relational schemas (`User`, `ChatSession`, `Document`, 
-`ChatMessage`, `UsageStats`).
+- JWT-based authentication (access & refresh tokens).
 
-- **CRUD Operations** – Encapsulated per schema (e.g., `user_model.py`, `session_model.py`).  
+- Middleware ensures protected endpoints require authentication.
 
-- **Vector Store Integration** – Maintains embeddings and supports similarity search.  
+- Role-based access can be extended (e.g., user, admin).
 
-### 🔹 AI Layer
+## Database Design
 
-- **RAG Pipeline:**
+- SQLModel (PostgresSQL backend).
 
-  1. Retrieve top-k relevant document chunks.  
-  2. Construct prompt with context + chat history.  
-  3. Call LLM (OpenAI API, HuggingFace, or custom).  
-  4. Stream or return assistant response.
+- Entities: User, ChatSession, Document, ChatMessage, UsageStats.
 
-- **User** – Auth + subscription details.  
+- Each has its own DataModel class inside database/models to encapsulate CRUD operations.
 
-- **ChatSession** – Groups related documents and messages.
+- Schema (Pydantic) classes are defined in database/schemas for request/response validation.
 
-- **Document** – Uploads linked to sessions & users.
+## Data Flow
 
-- **ChatMessage** – Logs conversations (user ↔ assistant). 
+1. Request enters via route → Mapped in api/v1/routes.
 
-- **UsageStats** – Tracks token usage and limits.
+2. Controller layer validates input, orchestrates services, and manages error handling.
 
-## Suggested Diagrams to Draw
+3. Service layer performs business logic (e.g., verifying token quota, calling RAG pipeline).
 
-### High-Level System Diagram
+4. Model/Data layer performs DB operations and returns results.
 
-- Shows: API Layer → Service Layer → Persistence Layer → AI Layer → LLM.
+5. Controller returns the response wrapped in standardized JSON schema.
 
-- Request flow: **User → FastAPI → DB + Vector Store → LLM → Response**.  
+### Example Flow: Creating a Chat Session
 
-### Database ER Diagram
+1. Route: POST /sessions/
 
-- Entities: `User`, `ChatSession`, `Document`, `ChatMessage`, `UsageStats`.  
-- Relationships:  
-  - `User (1) → (∞) ChatSession`  
-  - `ChatSession (1) → (∞) Document`  
-  - `ChatSession (1) → (∞) ChatMessage`  
-  - `User (1) → (1) UsageStats`  
+2. Controller: SessionController.create_session()
 
-### Sequence Diagram (Chat Request Flow)
+3. Service: SessionService.create_session(user, data) → validates user plan/quota.
 
-1. User sends message.  
-2. API validates authentication.  
-3. Retrieve session + documents from DB/vector store.  
-4. Construct RAG prompt → Send to LLM.  
-5. Receive assistant response.  
-6. Store message + tokens in DB.  
-7. Return response to user.  
+4. Model: ChatSessionModel.create(data) → inserts into DB.
 
----
+5. Response: New session details (via schema) returned to the client.
 
-## Scalability & Extension Points
+## Middleware Responsibilities
 
-- **Pluggable Vector Store**: Start with FAISS (local), upgrade to Pinecone/Weaviate.  
-- **Authentication**: OAuth2/JWT, extendable for enterprise SSO.  
-- **Task Queues** (Celery, RQ) for background document ingestion.  
-- **Caching Layer** (Redis) for faster retrieval & token savings.
+- Authentication middleware: validates JWT tokens.
+
+- Error handling middleware: converts unhandled exceptions into proper HTTP responses.
+
+- Logging middleware: captures request/response cycles for debugging & monitoring.
+
+## Modularity & Extensibility
+
+- Each domain (User, Session, Document, Message, Usage) has its own Service + Controller + DataModel.
+
+- Adding new features (e.g., payment plans, analytics) requires minimal changes due to modular design.
+
+- Database repository pattern allows easy migration from Postgres → MySQL → SQLite if needed.
+
+## Testing Strategy
+
+- Unit tests: For services and models.
+
+- Integration tests: For API endpoints (via FastAPI TestClient).
+
+- Mocking external dependencies: (e.g., vector DB, RAG pipeline).
+
