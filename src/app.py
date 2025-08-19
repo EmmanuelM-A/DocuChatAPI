@@ -6,6 +6,7 @@ the application.
 from fastapi import FastAPI
 
 from src.middleware.exception_handler import setup_exception_handlers
+from src.middleware.http_logging import HTTPLoggingMiddleware
 
 
 def create_app():
@@ -13,8 +14,12 @@ def create_app():
 
     app = FastAPI()
 
-    # Register routes
+    # Middlewares
+    app.add_middleware(HTTPLoggingMiddleware)
 
+    # Routes
+
+    # Exception handling middleware
     setup_exception_handlers(app)
 
     return app

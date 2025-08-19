@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="feat: implemented a standard api response structure for success and error responses">
-      <change beforePath="$PROJECT_DIR$/.idea/DocuChatAPI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DocuChatAPI.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/PylintPlugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PylintPlugin.xml" afterDir="false" />
+    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="docs: updated architecture middleware responsibilities">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/__init__.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/schemas/user_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/server.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -275,7 +271,71 @@
       <option name="project" value="LOCAL" />
       <updated>1755598828676</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="feat: implementing custom api exceptions">
+      <option name="closed" value="true" />
+      <created>1755603082824</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1755603082824</updated>
+    </task>
+    <task id="LOCAL-00017" summary="feat: setting up application and server entry point">
+      <option name="closed" value="true" />
+      <created>1755603122907</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1755603122907</updated>
+    </task>
+    <task id="LOCAL-00018" summary="refactor: added some boilerplate files/folders to the project">
+      <option name="closed" value="true" />
+      <created>1755603171779</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1755603171779</updated>
+    </task>
+    <task id="LOCAL-00019" summary="feat: implemented the rest of the api exceptions">
+      <option name="closed" value="true" />
+      <created>1755615672182</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1755615672182</updated>
+    </task>
+    <task id="LOCAL-00020" summary="feat: implemented a basic console logger">
+      <option name="closed" value="true" />
+      <created>1755616874177</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1755616874177</updated>
+    </task>
+    <task id="LOCAL-00021" summary="feat: implemented exception handlers">
+      <option name="closed" value="true" />
+      <created>1755619980946</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1755619980946</updated>
+    </task>
+    <task id="LOCAL-00022" summary="docs: updated architecture middleware responsibilities">
+      <option name="closed" value="true" />
+      <created>1755620501560</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1755620501560</updated>
+    </task>
+    <task id="LOCAL-00023" summary="docs: updated architecture middleware responsibilities">
+      <option name="closed" value="true" />
+      <created>1755620520763</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1755620520763</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -303,6 +363,13 @@
     <MESSAGE value="docs: all project documentation completed" />
     <MESSAGE value="docs: added a framework to the readme and some initial content" />
     <MESSAGE value="feat: implemented a standard api response structure for success and error responses" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: implemented a standard api response structure for success and error responses" />
+    <MESSAGE value="feat: implementing custom api exceptions" />
+    <MESSAGE value="feat: setting up application and server entry point" />
+    <MESSAGE value="refactor: added some boilerplate files/folders to the project" />
+    <MESSAGE value="feat: implemented the rest of the api exceptions" />
+    <MESSAGE value="feat: implemented a basic console logger" />
+    <MESSAGE value="feat: implemented exception handlers" />
+    <MESSAGE value="docs: updated architecture middleware responsibilities" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: updated architecture middleware responsibilities" />
   </component>
 </project>
