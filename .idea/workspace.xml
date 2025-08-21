@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="docs: updated architecture middleware responsibilities">
+    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="docs: added project documentation to help guide frontend development (down the line)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/schemas/user_schema.py" afterDir="false" />
     </list>
@@ -335,7 +334,31 @@
       <option name="project" value="LOCAL" />
       <updated>1755620520763</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="feat: setting up basic middleware">
+      <option name="closed" value="true" />
+      <created>1755621541558</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1755621541558</updated>
+    </task>
+    <task id="LOCAL-00025" summary="docs: improved project documentation">
+      <option name="closed" value="true" />
+      <created>1755805636401</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1755805636401</updated>
+    </task>
+    <task id="LOCAL-00026" summary="docs: added project documentation to help guide frontend development (down the line)">
+      <option name="closed" value="true" />
+      <created>1755807571943</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1755807571943</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -370,6 +393,9 @@
     <MESSAGE value="feat: implemented a basic console logger" />
     <MESSAGE value="feat: implemented exception handlers" />
     <MESSAGE value="docs: updated architecture middleware responsibilities" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: updated architecture middleware responsibilities" />
+    <MESSAGE value="feat: setting up basic middleware" />
+    <MESSAGE value="docs: improved project documentation" />
+    <MESSAGE value="docs: added project documentation to help guide frontend development (down the line)" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: added project documentation to help guide frontend development (down the line)" />
   </component>
 </project>
