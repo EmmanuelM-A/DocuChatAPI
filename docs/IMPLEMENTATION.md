@@ -18,20 +18,6 @@ It details the order of implementation, testing scope, and important considerati
 | **Development**     | Docker Compose       | -       | Local environment setup       | `docker`, `docker-compose`                     |
 
 
-## High-Level Roadmap
-
-| Phase   | Task Group                    | Priority   | Description                                                                                         |
-|---------|-------------------------------|------------|-----------------------------------------------------------------------------------------------------|
-| 1       | Project Setup                 | High       | Initialize FastAPI project, configure environment, database connection, and base project structure. |
-| 2       | Core API Setup                | High       | Expose RAG chatbot functionality via REST API with initial endpoints.                               |
-| 3       | User Management               | High       | Implement user authentication/authorization (JWT), registration, and login.                         |
-| 4       | Session & Document Management | High       | Add support for sessions, document uploads, embeddings storage, and metadata management.            |
-| 5       | Chat Messaging                | High       | Enable chat persistence, roles, and history retrieval.                                              |
-| 6       | Usage Tracking                | Medium     | Track token usage, doc count, and session count per user.                                           |
-| 7       | Testing & QA                  | High       | Implement unit, integration, and e2e tests progressively.                                           |
-| 8       | Advanced Features             | Medium     | Rate limiting, middleware (logging, error handling), plan enforcement (free vs premium).            |
-| 9       | Deployment                    | High       | Dockerize, configure CI/CD, setup production database/vector store.                                 |
-
 ---
 
 ## Phase 1: Foundation Setup (Week 1)
