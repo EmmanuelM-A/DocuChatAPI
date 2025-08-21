@@ -4,6 +4,7 @@ Logger utility for the application with colorized console output.
 
 import logging
 import os
+import sys
 from typing import Optional
 
 from src.config.settings import settings
@@ -27,6 +28,24 @@ class ColorFormatter(logging.Formatter):
         return f"{color}{formatted_msg}{self.RESET}"
 
 
+def __get_log_level(level: str) -> int:
+    """
+    Converts the log level string into its numerical counterpart.
+    """
+
+    level_mappings = {
+        "CRITICAL": 50,
+        "FATAL": 50,
+        "ERROR": 40,
+        "WARNING": 30,
+        "WARN": 30,
+        "INFO": 20,
+        "DEBUG": 10,
+    }
+
+    return level_mappings.get(level.upper(), 20)
+
+
 def get_logger(
     name: str, log_dir: Optional[str] = settings.LOG_DIRECTORY
 ) -> logging.Logger:
@@ -44,26 +63,48 @@ def get_logger(
 
     default_logger = logging.getLogger(name)
 
-    if default_logger.hasHandlers():
-        return default_logger  # Avoid adding multiple handlers
+    log_level = __get_log_level(settings.LOG_LEVEL)
+    default_logger.setLevel(log_level)
 
-    # Set global level TODO: switch to env-controlled later
-    default_logger.setLevel(logging.DEBUG)
-
-    # Create log directory (no file handlers yet, but future-proof)
-    if log_dir:
-        os.makedirs(log_dir, exist_ok=True)
-
-    # Colorized console handler
-    console_handler = logging.StreamHandler()
-    color_formatter = ColorFormatter(
-        fmt="[%(asctime)s] [%(levelname)s] %(name)s: %(message)s",
+    # Create formatters
+    file_formatter = logging.Formatter(
+        "%(name)s -> %(asctime)s [%(levelname)s]: %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    console_handler.setFormatter(color_formatter)
-    default_logger.addHandler(console_handler)
+    console_formatter = ColorFormatter(
+        "%(name)s -> %(asctime)s [%(levelname)s]: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+    if settings.IS_FILE_LOGGING_ENABLED:
+        # FILE LOGGING MODE
+        try:
+            # Create log directory if it doesn't exist
+            os.makedirs(log_dir, exist_ok=True)
+
+            # General log file (all logs)
+            app_log_path = os.path.join(log_dir, "app.log")
+            file_handler = logging.FileHandler(app_log_path, encoding="utf-8")
+            file_handler.setLevel(log_level)
+            file_handler.setFormatter(file_formatter)
+            default_logger.addHandler(file_handler)
+
+            # Error log file (errors only)
+            error_log_path = os.path.join(log_dir, "error.log")
+            error_handler = logging.FileHandler(error_log_path, encoding="utf-8")
+            error_handler.setLevel(logging.ERROR)
+            error_handler.setFormatter(file_formatter)
+            default_logger.addHandler(error_handler)
+        except ValueError:
+            # Fallback to console if file logging fails
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setFormatter(console_formatter)
+            default_logger.addHandler(console_handler)
+    else:
+        # CONSOLE LOGGING MODE
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(log_level)
+        console_handler.setFormatter(console_formatter)
+        default_logger.addHandler(console_handler)
 
     return default_logger
-
-
-logger = get_logger(__name__)
