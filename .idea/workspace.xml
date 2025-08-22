@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="docs: added project documentation to help guide frontend development (down the line)">
+    <list default="true" id="020e3244-d79c-482f-8006-da817c40c40b" name="Changes" comment="refactor: updated settings and integrated it in the logger">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/db_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/db_connection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/schemas/user_schema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -18,6 +20,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Python Script" />
+        <option value="Python Unit Test" />
       </list>
     </option>
   </component>
@@ -61,6 +64,9 @@
     &quot;accountId&quot;: &quot;32a9ca90-f4d7-42bb-aae6-a589116507ba&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/config/settings.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -72,18 +78,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.server.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests for test_database_connection.TestDatabaseConnection.executor": "Run",
+    "Python.default_logger.executor": "Run",
+    "Python.server.executor": "Run",
+    "Python.settings.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\maduk\Documents\Programming\Personal Projects\DocuChatAPI\docs" />
@@ -91,7 +100,7 @@
       <recent name="C:\Users\maduk\Documents\Programming\Personal Projects\DocuChatAPI\src\docs" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.server">
     <configuration name="server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="DocuChatAPI" />
       <option name="ENV_FILES" value="" />
@@ -106,6 +115,28 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/server.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="settings" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="DocuChatAPI" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/config" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/config/settings.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -129,9 +160,26 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests for test_database_connection.TestDatabaseConnection" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DocuChatAPI" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit/database" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_database_connection.TestDatabaseConnection&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.server" />
+        <item itemvalue="Python.settings" />
+        <item itemvalue="Python tests.Python tests for test_database_connection.TestDatabaseConnection" />
       </list>
     </recent_temporary>
   </component>
@@ -358,7 +406,55 @@
       <option name="project" value="LOCAL" />
       <updated>1755807571943</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="feat: updated and added some settings">
+      <option name="closed" value="true" />
+      <created>1755810086523</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1755810086523</updated>
+    </task>
+    <task id="LOCAL-00028" summary="docs(implementation_plan): removed redundant and conflicting information">
+      <option name="closed" value="true" />
+      <created>1755811722050</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1755811722050</updated>
+    </task>
+    <task id="LOCAL-00029" summary="perf(logging): logs can now be sent to console or file and log level is configured using env variables.">
+      <option name="closed" value="true" />
+      <created>1755812532952</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1755812532952</updated>
+    </task>
+    <task id="LOCAL-00030" summary="perf(logging): logs can now be sent to console or file and log level is configured using env variables.">
+      <option name="closed" value="true" />
+      <created>1755812824386</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1755812824386</updated>
+    </task>
+    <task id="LOCAL-00031" summary="refactor: split the config settings into separate domain specific configs">
+      <option name="closed" value="true" />
+      <created>1755815283773</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1755815283773</updated>
+    </task>
+    <task id="LOCAL-00032" summary="refactor: updated settings and integrated it in the logger">
+      <option name="closed" value="true" />
+      <created>1755848477065</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1755848477065</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -373,9 +469,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Initial project" />
-    <MESSAGE value="Initial project creation" />
-    <MESSAGE value="Working on project structure and started schema design" />
     <MESSAGE value="Working on api documentation and plan" />
     <MESSAGE value="Added the endpoint documentation" />
     <MESSAGE value="Put all the api documentation into one file for simplicity" />
@@ -396,6 +489,11 @@
     <MESSAGE value="feat: setting up basic middleware" />
     <MESSAGE value="docs: improved project documentation" />
     <MESSAGE value="docs: added project documentation to help guide frontend development (down the line)" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: added project documentation to help guide frontend development (down the line)" />
+    <MESSAGE value="feat: updated and added some settings" />
+    <MESSAGE value="docs(implementation_plan): removed redundant and conflicting information" />
+    <MESSAGE value="perf(logging): logs can now be sent to console or file and log level is configured using env variables." />
+    <MESSAGE value="refactor: split the config settings into separate domain specific configs" />
+    <MESSAGE value="refactor: updated settings and integrated it in the logger" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: updated settings and integrated it in the logger" />
   </component>
 </project>
