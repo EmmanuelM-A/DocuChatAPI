@@ -58,8 +58,8 @@ class AuthSettings(BaseSettings):
     Authentication and authorization configuration settings.
     """
 
-    ACCESS_SECRET: SecretStr = Field(..., env="ACCESS_TOKEN_SECRET")
-    REFRESH_SECRET: SecretStr = Field(..., env="REFRESH_TOKEN_SECRET")
+    # ACCESS_SECRET: SecretStr = Field(..., env="ACCESS_TOKEN_SECRET")
+    # REFRESH_SECRET: SecretStr = Field(..., env="REFRESH_TOKEN_SECRET")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=5)
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
 
@@ -89,7 +89,7 @@ class FileProcessingSettings(BaseSettings):
 # LLM Integration
 # ------------------------------------------------------------------
 class LLMIntegrationSettings(BaseSettings):
-    OPENAI_API_KEY: Optional[SecretStr] = Field(default=None, env="OPENAI_API_KEY")
+    # OPENAI_API_KEY: SecretStr = Field(default=..., env="OPENAI_API_KEY")
     LLM_MODEL_NAME: str = Field(default="gpt-3.5-turbo")
     EMBEDDING_MODEL_NAME: str = Field(default="text-embedding-3-small")
 
@@ -135,8 +135,8 @@ class VectorStoreSettings(BaseSettings):
 # ------------------------------------------------------------------
 class WebSearchSettings(BaseSettings):
     IS_WEB_SEARCH_ENABLED: bool = Field(default=False)
-    SEARCH_API_KEY: Optional[SecretStr] = Field(default=None, env="SEARCH_API_KEY")
-    SEARCH_ENGINE_ID: Optional[SecretStr] = Field(default=None, env="SEARCH_ENGINE_ID")
+    # SEARCH_API_KEY: SecretStr = Field(default=..., env="SEARCH_API_KEY")
+    # SEARCH_ENGINE_ID: SecretStr = Field(default=..., env="SEARCH_ENGINE_ID")
 
     MAX_WEB_SEARCH_RESULTS: int = Field(default=5)
     WEB_REQUEST_TIMEOUT_SECS: int = Field(default=15)
@@ -204,7 +204,7 @@ class MonitoringSettings(BaseSettings):
     ENABLE_METRICS: bool = Field(default=True)
     METRICS_ENDPOINT: str = Field(default="/metrics")
 
-    SENTRY_DSN: Optional[SecretStr] = Field(default=None, env="SENTRY_DSN")
+    # SENTRY_DSN: Optional[SecretStr] = Field(default=None, env="SENTRY_DSN")
     SENTRY_ENVIRONMENT: str = Field(default="development")
 
     QA_SQLITE_DB_PATH: str = Field(default="../data/db/qa_log.db")
