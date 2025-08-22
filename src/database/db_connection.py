@@ -1,49 +1,43 @@
 """
-Handles connections to the database and session management.
+Concrete implementation of AbstractDatabaseConnection for PostgresSQL
+using SQLAlchemy with asyncpg. Handling connections to the database and session
+management.
 """
-from typing import Generator
 
-from sqlmodel import SQLModel, create_engine, Session
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from src.database.base.connection import AbstractDatabaseConnection
+from src.config.settings import settings
 
-DEFAULT_DATABASE_URL = ""
 
-
-class DatabaseConnection:
+class PostgresConnection(AbstractDatabaseConnection):
     """
-    Manages database engine and session lifecycle using SQLModel.
+    PostgresSQL database connection implementation using SQLAlchemy async engine.
 
-    Attributes:
-        engine (Engine): SQLModel-compatible SQLAlchemy engine instance.
+    This class handles connection pooling, session management, and cleanup.
     """
 
-    def __init__(
-            self,
-            database_url: str = DEFAULT_DATABASE_URL,
-            echo: bool = True
-    ):
-        """
-        Initializes the database engine.
+    def __init__(self, database_url: str = None):
+        self.database_url = database_url or str(settings.database.DATABASE_URL.get_secret_value())
+        self.engine = None
+        self.session_maker = None
 
-        Args:
-            database_url (str): The database connection string.
-            echo (bool): If True, SQL statements will be logged.
-        """
-        self.engine = create_engine(database_url, echo=echo)
+    async def connect(self):
+        """Create the async SQLAlchemy engine and session factory."""
+        self.engine = create_async_engine(self.database_url, echo=settings.database.DB_ECHO)
+        self.session_maker = async_sessionmaker(bind=self.engine, expire_on_commit=False)
 
-    def get_session(self) -> Generator[Session, None, None]:
-        """
-        Provides a generator-based database session for dependency injection
-        in FastAPI.
+    async def disconnect(self):
+        """Dispose the engine and close connections."""
+        if self.engine:
+            await self.engine.dispose()
 
-        Yields:
-            Session: A SQLModel session bound to the engine.
+    def get_session(self) -> AsyncSession:
         """
-        with Session(self.engine) as session:
-            yield session
+        Get a new database session.
 
-    def create_db_and_tables(self) -> None:
+        Returns:
+            AsyncSession: A SQLAlchemy asynchronous session object.
         """
-        Creates all tables defined in SQLModel metadata.
-        Useful to run at app startup.
-        """
-        SQLModel.metadata.create_all(self.engine)
+        if not self.session_maker:
+            raise RuntimeError("Database not connected. Call connect() first.")
+        return self.session_maker()

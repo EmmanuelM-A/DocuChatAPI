@@ -9,4 +9,7 @@ pydantic-settings~=2.10.1
 slowapi~=0.1.9
 asyncpg~=0.30.0
 pytest~=8.3.5
-pytest-asyncio==1.1.0
+SQLAlchemy~=2.0.43
+
+pylint==3.3.8
+black==25.1.0

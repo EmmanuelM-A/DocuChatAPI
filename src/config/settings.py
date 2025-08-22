@@ -45,7 +45,7 @@ class DatabaseSettings(BaseSettings):
 
     DB_POOL_SIZE: int = Field(default=10)
     DB_MAX_OVERFLOW: int = Field(default=20)
-    DB_ECHO: bool = Field(default=False)
+    DB_ECHO: bool = Field(default=True)
 
     model_config = SettingsConfigDict(env_file=ENV_FILE, extra="ignore")
 
