@@ -3,12 +3,10 @@ Handles database connection testing.
 """
 
 import asyncpg
-
 import pytest
-from src.config.settings import settings
-from src.logger.default_logger import get_logger
 
-logger = get_logger("TEST_DB_CONN")
+from src.config.settings import settings
+from src.logger.default_logger import logger
 
 DATABASE_URL = str(settings.database.DATABASE_URL.get_secret_value())
 
@@ -22,16 +20,12 @@ class TestDatabaseConnection:
 
         conn = None
         try:
-            # Test basic connection
             conn = await asyncpg.connect(DATABASE_URL)
-
-            # Test query
             result = await conn.fetchval("SELECT version()")
 
             logger.info(f"Connection successful! PostgresSQL version: {result}")
+            assert result is not None, "Expected PostgresSQL version but got None"
 
-        except Exception as e:
-            logger.error(f"Connection failed: {e}")
         finally:
             if conn is not None:
                 await conn.close()
@@ -42,11 +36,8 @@ class TestDatabaseConnection:
 
         conn = None
         try:
-            # Test basic connection
             conn = await asyncpg.connect(DATABASE_URL)
-
-            # Test table creation
-            await conn.execute(
+            result = await conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS test_table (
                     id SERIAL PRIMARY KEY,
@@ -56,9 +47,8 @@ class TestDatabaseConnection:
             )
 
             logger.info("Table creation successful!")
+            assert result.startswith("CREATE TABLE") or result.startswith("CREATE TABLE IF NOT EXISTS")
 
-        except Exception as e:
-            logger.error(f"Connection failed: {e}")
         finally:
             if conn is not None:
                 await conn.close()
