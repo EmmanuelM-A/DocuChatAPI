@@ -2,9 +2,10 @@
 Handles database connection testing.
 """
 
-from src.config.settings import settings
 import asyncpg
 
+import pytest
+from src.config.settings import settings
 from src.logger.default_logger import get_logger
 
 logger = get_logger("TEST_DB_CONN")
@@ -15,6 +16,7 @@ DATABASE_URL = str(settings.database.DATABASE_URL.get_secret_value())
 class TestDatabaseConnection:
     """Tests if the application can connect to the database"""
 
+    @pytest.mark.asyncio
     async def test_database_connection(self):
         """Tests if the database connection can be successfully made."""
 
@@ -34,6 +36,7 @@ class TestDatabaseConnection:
             if conn is not None:
                 await conn.close()
 
+    @pytest.mark.asyncio
     async def test_table_creation(self):
         """Tests if table creation is possible in the database."""
 
