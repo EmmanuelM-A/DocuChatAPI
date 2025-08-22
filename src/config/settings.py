@@ -159,12 +159,11 @@ class WebSearchSettings(BaseSettings):
 # ------------------------------------------------------------------
 class LoggingSettings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO")
-    ROOT_LOG_LEVEL: str = Field(default="WARNING")
-    LOG_DIRECTORY: str = Field(default="../logs")
-    IS_FILE_LOGGING_ENABLED: bool = Field(default=True)
-    IS_CONSOLE_LOGGING_ENABLED: bool = Field(default=True)
+    LOG_DIRECTORY: str = Field(default="../../../logs")
+    LOG_FORMAT: str = Field(default="%(asctime)s [%(levelname)s]: %(message)s")
+    DATE_FORMAT: str = Field(default="%Y-%m-%dT%H:%M:%S")
+    IS_FILE_LOGGING_ENABLED: bool = Field(default=False)
     LOG_MAX_BYTES: int = Field(default=10485760)
-    LOG_BACKUP_COUNT: int = Field(default=5)
 
     LOG_WEB_SEARCHES: bool = Field(default=False)
     LOG_DATABASE_QUERIES: bool = Field(default=False)

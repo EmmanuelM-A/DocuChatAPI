@@ -68,12 +68,12 @@ def get_logger(
 
     # Create formatters
     file_formatter = logging.Formatter(
-        "%(name)s -> %(asctime)s [%(levelname)s]: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+        fmt=settings.logging.LOG_FORMAT,
+        datefmt=settings.logging.DATE_FORMAT,
     )
     console_formatter = ColorFormatter(
-        "%(name)s -> %(asctime)s [%(levelname)s]: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+        fmt=settings.logging.LOG_FORMAT,
+        datefmt=settings.logging.DATE_FORMAT,
     )
 
     if settings.logging.IS_FILE_LOGGING_ENABLED:
@@ -108,3 +108,5 @@ def get_logger(
         default_logger.addHandler(console_handler)
 
     return default_logger
+
+logger = get_logger(__name__)
