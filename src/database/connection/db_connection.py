@@ -5,7 +5,7 @@ management.
 """
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from src.database.base.connection import AbstractDatabaseConnection
+from src.database.connection.base_connection import AbstractDatabaseConnection
 from src.config.settings import settings
 
 
@@ -17,14 +17,20 @@ class PostgresConnection(AbstractDatabaseConnection):
     """
 
     def __init__(self, database_url: str = None):
-        self.database_url = database_url or str(settings.database.DATABASE_URL.get_secret_value())
+        self.database_url = database_url or str(
+            settings.database.DATABASE_URL.get_secret_value()
+        )
         self.engine = None
         self.session_maker = None
 
     async def connect(self):
         """Create the async SQLAlchemy engine and session factory."""
-        self.engine = create_async_engine(self.database_url, echo=settings.database.DB_ECHO)
-        self.session_maker = async_sessionmaker(bind=self.engine, expire_on_commit=False)
+        self.engine = create_async_engine(
+            self.database_url, echo=settings.database.DB_ECHO
+        )
+        self.session_maker = async_sessionmaker(
+            bind=self.engine, expire_on_commit=False
+        )
 
     async def disconnect(self):
         """Dispose the engine and close connections."""
