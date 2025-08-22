@@ -47,7 +47,7 @@ def __get_log_level(level: str) -> int:
 
 
 def get_logger(
-    name: str, log_dir: Optional[str] = settings.LOG_DIRECTORY
+    name: str, log_dir: Optional[str] = settings.logging.LOG_DIRECTORY
 ) -> logging.Logger:
     """
     Returns a configured logger that logs colorized messages to the console.
@@ -63,7 +63,7 @@ def get_logger(
 
     default_logger = logging.getLogger(name)
 
-    log_level = __get_log_level(settings.LOG_LEVEL)
+    log_level = __get_log_level(settings.logging.LOG_LEVEL)
     default_logger.setLevel(log_level)
 
     # Create formatters
@@ -76,7 +76,7 @@ def get_logger(
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    if settings.IS_FILE_LOGGING_ENABLED:
+    if settings.logging.IS_FILE_LOGGING_ENABLED:
         # FILE LOGGING MODE
         try:
             # Create log directory if it doesn't exist

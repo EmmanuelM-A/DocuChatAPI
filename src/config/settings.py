@@ -64,8 +64,10 @@ class AuthSettings(BaseSettings):
     """
 
     # JWT Configuration
-    ACCESS_SECRET: SecretStr = Field(env="ACCESS_TOKEN_SECRET")
-    REFRESH_SECRET: SecretStr = Field(env="REFRESH_TOKEN_SECRET")
+    ACCESS_SECRET: SecretStr = Field(
+        default=None, env="ACCESS_TOKEN_SECRET"
+    )  # TODO: POPULATE ENV FILE AND SORT OUT SETTINGS
+    REFRESH_SECRET: SecretStr = Field(default=None, env="REFRESH_TOKEN_SECRET")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=5)
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
 
@@ -81,13 +83,9 @@ class FileProcessingSettings(BaseSettings):
     """
 
     # File Upload Configuration
-    ALLOWED_FILE_EXTENSIONS: List[str] = Field(
-        default=[".pdf", ".docx", ".txt", ".md"],
-    )
+    ALLOWED_FILE_EXTENSIONS: List[str] = Field(default=[".pdf", ".docx", ".txt", ".md"])
     MAX_FILE_SIZE_MB: int = Field(default=20)
-    MAX_FILES_PER_UPLOAD: int = Field(
-        default=10, description="Maximum number of files per upload request"
-    )
+    MAX_FILES_PER_UPLOAD: int = Field(default=10)
 
     # Storage Paths
     RAW_DOCS_DIRECTORY: str = Field(
