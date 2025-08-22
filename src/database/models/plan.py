@@ -1,5 +1,5 @@
 """
-Subscription plans that define user limits and pricing.
+Represents subscription plans that define user limits and pricing.
 """
 
 import uuid
@@ -23,14 +23,13 @@ from sqlalchemy import (
     CheckConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
+from src.database.models.base import Base
 
-from src.config.settings import settings
 
-
-class Plan(settings):
+class Plan(Base):
     """
     This model stores different subscription tiers (free, pro, enterprise)
     with their associated limits for tokens, documents, and sessions.
