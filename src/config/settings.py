@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 # ------------------------------------------------------------------
 # Load .env file explicitly
 # ------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 ENV_FILE = PROJECT_ROOT / ".env"
 
 if ENV_FILE.exists():
@@ -36,7 +36,7 @@ class CoreAppSettings(BaseSettings):
 # Database Settings
 # ------------------------------------------------------------------
 class DatabaseSettings(BaseSettings):
-    DATABASE_URL: Optional[SecretStr] = Field(default=None, env="DATABASE_URL")
+    DATABASE_URL: SecretStr = Field(default=..., env="DATABASE_URL")
     DB_HOST: str = Field(default="localhost", env="DB_HOST")
     DB_PORT: int = Field(default=5432, env="DB_PORT")
     DB_NAME: str = Field(default="docu_chat", env="DB_NAME")
@@ -58,8 +58,8 @@ class AuthSettings(BaseSettings):
     Authentication and authorization configuration settings.
     """
 
-    # ACCESS_SECRET: SecretStr = Field(..., env="ACCESS_TOKEN_SECRET")
-    # REFRESH_SECRET: SecretStr = Field(..., env="REFRESH_TOKEN_SECRET")
+    ACCESS_SECRET: SecretStr = Field(..., env="ACCESS_TOKEN_SECRET")
+    REFRESH_SECRET: SecretStr = Field(..., env="REFRESH_TOKEN_SECRET")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=5)
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
 
@@ -235,3 +235,9 @@ class Settings(BaseSettings):
 
 # Global settings instance
 settings = Settings()
+
+
+if __name__ == "__main__":
+    db_url = settings.database.DATABASE_URL.get_secret_value()
+
+    print(db_url)
