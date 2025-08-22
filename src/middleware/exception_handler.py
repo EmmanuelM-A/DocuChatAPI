@@ -6,11 +6,9 @@ Handles both custom ApiException instances and unexpected errors.
 from fastapi import Request, HTTPException, status, FastAPI
 from starlette.responses import JSONResponse
 
-from src.logger.default_logger import get_logger
+from src.logger.default_logger import logger
 from src.utils.api_exceptions import ApiException
 from src.utils.api_responses import ErrorDetail, ErrorResponse
-
-logger = get_logger(__name__)
 
 
 async def api_exception_handler(request: Request, exc: ApiException) -> JSONResponse:
