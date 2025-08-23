@@ -47,6 +47,7 @@ class DatabaseSettings(BaseSettings):
     DB_MAX_OVERFLOW: int = Field(default=20)
     DB_POOL_TIMEOUT: int = Field(default=30)
     DB_ECHO: bool = Field(default=True)
+    DB_IS_POOL_PRE_PING_ENABLED: bool = Field(default=True)
 
     DB_SAFETY_ENABLED: bool = Field(default=True)
 
