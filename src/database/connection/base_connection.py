@@ -7,7 +7,7 @@ This provides a contract for implementing different database backends
 from abc import ABC, abstractmethod
 
 
-class AbstractDatabaseConnection(ABC):
+class DatabaseConnection(ABC):
     """
     Abstract class that defines the interface for database connections.
 

@@ -11,6 +11,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
+from database.connection.base_connection import DatabaseConnection
 from database.models.plan import Plan
 from database.models.user_model import User
 from logger.default_logger import logger
@@ -25,7 +26,7 @@ class DatabaseEngine:
     Handles database initialization, health checks, and session management.
     """
 
-    def __init__(self, connection: PostgresConnection = None):
+    def __init__(self, connection: DatabaseConnection = None):
         """
         Initialize the database engine.
 

@@ -5,12 +5,12 @@ management.
 """
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from src.database.connection.base_connection import AbstractDatabaseConnection
+from src.database.connection.base_connection import DatabaseConnection
 from src.config.settings import settings
 from utils.api_exceptions import DatabaseException
 
 
-class PostgresConnection(AbstractDatabaseConnection):
+class PostgresConnection(DatabaseConnection):
     """
     PostgresSQL database connection implementation using SQLAlchemy async engine.
 
@@ -48,6 +48,9 @@ class PostgresConnection(AbstractDatabaseConnection):
 
         Returns:
             AsyncSession: A SQLAlchemy asynchronous session object.
+
+        Raises:
+            DatabaseException:
         """
         if not self.session_maker:
             raise DatabaseException(
