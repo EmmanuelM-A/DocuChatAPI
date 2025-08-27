@@ -4,7 +4,7 @@ Plan data
 
 from decimal import Decimal
 
-from database.models.plan import Plan
+from database.models.plan_model import Plan
 
 plans = [
     Plan(

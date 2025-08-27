@@ -12,11 +12,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.connection.base_connection import DatabaseConnection
-from database.models.plan import Plan
+from database.models.plan_model import Plan
 from database.models.user_model import User
 from logger.default_logger import logger
 from src.database.connection.db_connection import PostgresConnection
-from src.database.models.base import Base
+from src.database.models.base_model import Base
 from src.config.settings import settings
 from utils.api_exceptions import DatabaseException
 
