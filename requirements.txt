@@ -11,3 +11,4 @@ pytest~=8.3.5
 SQLAlchemy~=2.0.43
 
 passlib~=1.7.4
+uliweb-alembic~=0.6.9

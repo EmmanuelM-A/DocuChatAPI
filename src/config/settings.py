@@ -3,9 +3,8 @@ Configuration settings for the DocuChatAPI application.
 Each configuration class handles a specific domain of settings.
 """
 
-import os
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -48,6 +47,11 @@ class DatabaseSettings(BaseSettings):
     DB_POOL_TIMEOUT: int = Field(default=30)
     DB_ECHO: bool = Field(default=True)
     DB_IS_POOL_PRE_PING_ENABLED: bool = Field(default=True)
+
+    DB_MIGRATION_DIR: str = Field(default="./")
+    DB_MIGRATION_FILE_TEMPLATE: str = Field(
+        default="%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s"
+    )
 
     DB_SAFETY_ENABLED: bool = Field(default=True)
 
