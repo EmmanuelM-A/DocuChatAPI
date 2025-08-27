@@ -496,10 +496,10 @@ class DatabaseException(InternalServerException):
 
     def __init__(
         self,
+        message: str,
         error_code: str = "DATABASE_ERROR",
         details: Optional[str] = None,
         stack_trace: Optional[str] = None,
-        message: Optional[str] = None,
     ):
         super().__init__(
             error_code=error_code,

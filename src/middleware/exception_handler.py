@@ -15,16 +15,14 @@ async def api_exception_handler(request: Request, exc: ApiException) -> JSONResp
     """
     Handle all exceptions derived from ApiException (custom application errors).
     """
-
-    error_data = exc.detail.get("error", {})
-    error_detail = ErrorDetail(**error_data)
+    error = exc.error_response.error  # This is the ErrorDetail model
 
     logger.error(
-        "API Exception | Path: %s | Status Code: %d | Code: %s | Message: %s",
+        "API Exception | Path: %s | Status Code: %d | Code: %s | Details: %s",
         request.url.path,
         exc.status_code,
-        error_detail.code,
-        error_detail.details,
+        error.code,
+        error.details or "No details provided",
     )
 
     return exc.error_response
