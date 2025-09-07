@@ -48,7 +48,7 @@ class DatabaseSettings(BaseSettings):
     DB_ECHO: bool = Field(default=True)
     DB_IS_POOL_PRE_PING_ENABLED: bool = Field(default=True)
 
-    DB_MIGRATION_DIR: str = Field(default="./")
+    DB_MIGRATION_DIR: str = Field(default="src/database/migrations")
     DB_MIGRATION_FILE_TEMPLATE: str = Field(
         default="%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s"
     )

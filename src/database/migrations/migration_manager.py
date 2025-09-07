@@ -11,14 +11,14 @@ from alembic.migration import MigrationContext
 from alembic.script import ScriptDirectory
 from sqlalchemy import create_engine
 
-from config.settings import settings
-from database.connection.base_connection import DatabaseConnection
-from database.connection.db_connection import PostgresConnection
-from database.migrations.alembic_env_template import ALEMBIC_ENV_TEMPLATE
-from database.migrations.alembic_ini_template import ALEMBIC_INI_TEMPLATE
+from src.config.settings import settings
+from src.database.connection.base_connection import DatabaseConnection
+from src.database.connection.db_connection import PostgresConnection
+from src.database.migrations.alembic_env_template import ALEMBIC_ENV_TEMPLATE
+from src.database.migrations.alembic_ini_template import ALEMBIC_INI_TEMPLATE
 
-from logger.default_logger import logger
-from utils.api_exceptions import DatabaseException
+from src.logger.default_logger import logger
+from src.utils.api_exceptions import DatabaseException
 
 
 class MigrationManager:
@@ -116,7 +116,7 @@ class MigrationManager:
             return message
         except Exception as e:
             logger.error("Failed to create migration: %s", e)
-            raise DatabaseException(
+            raise DatabaseException(  # FIXME: CREATE __REPR__ FOR ERROR RESPONSE
                 error_code="MIGRATION_CREATION_FAILED",
                 message=f"Migration creation failed: {e}",
             ) from e

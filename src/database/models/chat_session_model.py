@@ -68,12 +68,12 @@ class ChatSession(Base):
 
     # Relationships
     user = relationship("User", back_populates="chat_sessions")
-    documents = relationship(
+    """documents = relationship(
         "Document", back_populates="session", cascade="all, delete-orphan"
     )
     chat_messages = relationship(
         "ChatMessage", back_populates="session", cascade="all, delete-orphan"
-    )
+    )"""
 
     # Constraints
     __table_args__ = (

@@ -7,7 +7,7 @@ management.
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from src.database.connection.base_connection import DatabaseConnection
 from src.config.settings import settings
-from utils.api_exceptions import DatabaseException
+from src.utils.api_exceptions import DatabaseException
 
 
 class PostgresConnection(DatabaseConnection):

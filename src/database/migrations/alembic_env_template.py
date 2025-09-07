@@ -24,7 +24,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_
 sys.path.insert(0, project_root)
 
 # Import models for autogenerate support
-from src.database.models import Base
+from src.database.models.base_model import Base
 from src.config.settings import settings
 
 # Alembic Config object

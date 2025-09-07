@@ -76,13 +76,13 @@ class User(Base):
     chat_sessions = relationship(
         "ChatSession", back_populates="user", cascade="all, delete-orphan"
     )
-    documents = relationship(
+    """documents = relationship(
         "Document", back_populates="user", cascade="all, delete-orphan"
     )
     chat_messages = relationship("ChatMessage", back_populates="user")
     usage_stats = relationship(
         "UsageStats", back_populates="user", cascade="all, delete-orphan"
-    )
+    )"""
 
     # Validation
     @validates("email")

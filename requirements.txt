@@ -12,3 +12,7 @@ SQLAlchemy~=2.0.43
 
 passlib~=1.7.4
 uliweb-alembic~=0.6.9
+asyncio~=4.0.0
+argparse~=1.4.0
+bcrypt~=4.3.0
+greenlet~=3.2.3

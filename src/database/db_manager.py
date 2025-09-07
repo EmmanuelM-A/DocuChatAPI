@@ -6,19 +6,20 @@ from decimal import Decimal
 from typing import Optional, AsyncGenerator
 from contextlib import asynccontextmanager
 
+import bcrypt
 from passlib.context import CryptContext
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
-from database.connection.base_connection import DatabaseConnection
-from database.models.plan_model import Plan
-from database.models.user_model import User
-from logger.default_logger import logger
+from src.database.connection.base_connection import DatabaseConnection
+from src.database.models.plan_model import Plan
+from src.database.models.user_model import User
+from src.logger.default_logger import logger
 from src.database.connection.db_connection import PostgresConnection
 from src.database.models.base_model import Base
 from src.config.settings import settings
-from utils.api_exceptions import DatabaseException
+from src.utils.api_exceptions import DatabaseException
 
 
 class DatabaseEngine:
@@ -268,7 +269,9 @@ class DatabaseSeeder:
             test_user = User(
                 username=username,
                 email=email,
-                hashed_password=pwd_context.hash(password),
+                hashed_password=bcrypt.hashpw(
+                    password.encode("utf-8"), bcrypt.gensalt()
+                ).decode("utf-8"),
                 plan_id=plan_id,
                 email_verified=True,
                 is_active=True,
