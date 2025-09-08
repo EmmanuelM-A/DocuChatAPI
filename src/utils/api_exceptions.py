@@ -6,7 +6,7 @@ from typing import Optional
 
 from fastapi import HTTPException, status
 
-from src.utils.api_responses import ErrorDetail, ErrorResponse
+from src.utils.api_responses import ErrorDetail
 
 
 class ApiException(HTTPException):
@@ -33,11 +33,10 @@ class ApiException(HTTPException):
             message: A high-level message for the error response.
         """
 
-        self.error_response = ErrorResponse(
-            message=message, status_code=status_code, error=error_detail
-        )
+        self.error_detail = error_detail
+        self.message = message
 
-        super().__init__(status_code=status_code, detail=self.error_response)
+        super().__init__(status_code=status_code, detail=message)
 
 
 # ======================= 4xx Client Errors =======================
@@ -52,7 +51,9 @@ class BadRequestException(ApiException):
         self,
         error_code: str = "BAD_REQUEST",
         details: Optional[str] = None,
-        stack_trace: Optional[str] = None,
+        stack_trace: Optional[
+            str
+        ] = None,  # TODO: CONSIDER CHANGING THE STACK_TRACE TYPE TO EXCEPTION
         message: str = "The request is invalid or malformed.",
     ):
         error_detail = ErrorDetail(
