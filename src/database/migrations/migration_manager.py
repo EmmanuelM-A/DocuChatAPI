@@ -40,6 +40,22 @@ class MigrationManager:
         self._alembic_cfg: Optional[Config] = None
         self._migrations_path = settings.database.DB_MIGRATION_DIR
 
+    @staticmethod
+    def _get_sync_database_url() -> str:
+        """Convert async database URL to sync for migrations."""
+
+        database_url = str(settings.database.DATABASE_URL.get_secret_value())
+        if database_url.startswith("postgresql+asyncpg"):
+            return database_url.replace("postgresql+asyncpg", "postgresql+psycopg2")
+        return database_url
+
+    def _get_sync_engine(self):  # TODO: CONSIDER USING THIS
+        """Creates the sync engine"""
+
+        database_url = self._get_sync_database_url()
+
+        return create_engine(database_url)
+
     def _get_alembic_config(self) -> Config:
         """
         Get or create the Alembic configuration.
@@ -57,11 +73,7 @@ class MigrationManager:
             self._alembic_cfg.set_main_option("script_location", script_location)
 
             # Set database URL
-            database_url = str(settings.database.DATABASE_URL.get_secret_value())
-            if database_url.startswith("postgresql+asyncpg"):
-                database_url = database_url.replace(
-                    "postgresql+asyncpg", "postgresql+psycopg2"
-                )
+            database_url = self._get_sync_database_url()
             self._alembic_cfg.set_main_option("sqlalchemy.url", database_url)
 
             # Configure file template
@@ -174,11 +186,7 @@ class MigrationManager:
             config = self._get_alembic_config()
             script_dir = ScriptDirectory.from_config(config)
 
-            database_url = str(settings.database.DATABASE_URL.get_secret_value())
-            if database_url.startswith("postgresql+asyncpg"):
-                database_url = database_url.replace(
-                    "postgresql+asyncpg", "postgresql+psycopg2"
-                )
+            database_url = self._get_sync_database_url()
 
             sync_engine = create_engine(database_url)
 
@@ -226,11 +234,16 @@ class MigrationManager:
         Returns:
             bool: True if there are pending migrations, False otherwise
         """
+        sync_engine = None
         try:
             config = self._get_alembic_config()
             script_dir = ScriptDirectory.from_config(config)
 
-            with self._connection.engine.connect() as conn:
+            # Use sync engine for migration checks
+            database_url = self._get_sync_database_url()
+            sync_engine = create_engine(database_url)
+
+            with sync_engine.connect() as conn:
                 context = MigrationContext.configure(conn)
                 current_rev = context.get_current_revision()
                 head_rev = script_dir.get_current_head()
@@ -240,6 +253,9 @@ class MigrationManager:
         except Exception as e:
             logger.error("Failed to check pending migrations: %s", e)
             return False
+        finally:
+            if "sync_engine" in locals() and sync_engine is not None:
+                sync_engine.dispose()
 
     def show_current_info(self) -> dict:
         """
@@ -268,7 +284,9 @@ class MigrationSetup:
     and directory structure within the existing project layout.
     """
 
-    def __init__(self, migrations_path: Path = None):
+    def __init__(
+        self, migrations_path: Path = None, migration_manager: MigrationManager = None
+    ):
         """
         Initialize the migration setup utility.
 
@@ -277,6 +295,17 @@ class MigrationSetup:
         """
         self._migrations_path = migrations_path or Path(
             settings.database.DB_MIGRATION_DIR
+        )
+        self._migration_manager = migration_manager
+
+    def create_initial_migration(self) -> str:
+        """Create the initial migration file."""
+
+        if not self._migration_manager:
+            self._migration_manager = MigrationManager()
+
+        return self._migration_manager.create_migration(
+            "Initial database schema", autogenerate=True
         )
 
     def setup_migration_infrastructure(self) -> None:

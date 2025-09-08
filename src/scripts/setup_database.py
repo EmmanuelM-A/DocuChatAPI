@@ -42,7 +42,9 @@ class DatabaseSetupOrchestrator:
         """Initialize the setup orchestrator."""
         self._db_manager = DatabaseManager()
         self._migration_manager = MigrationManager()
-        self._migration_setup = MigrationSetup()
+        self._migration_setup = MigrationSetup(
+            migration_manager=self._migration_manager
+        )
 
     async def setup_migrations_infrastructure(self) -> None:
         """

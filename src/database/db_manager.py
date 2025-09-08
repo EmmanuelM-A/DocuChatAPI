@@ -55,6 +55,15 @@ class DatabaseEngine:
             self._is_initialized = True
             logger.info("Database engine initialized successfully")
         except Exception as e:
+            # Ensure cleanup on failure
+            try:
+                if self._connection.engine:
+                    await self._connection.disconnect()
+            except Exception as cleanup_error:
+                logger.error("Cleanup failed during initialization: %s", cleanup_error)
+
+            self._is_initialized = False
+
             raise DatabaseException(
                 error_code="DB_INIT_FAILED",
                 message=f"Database initialization failed: {e}",
@@ -124,6 +133,12 @@ class DatabaseEngine:
             raise DatabaseException(
                 error_code="TABLE_CREATION_FAILED",
                 message=f"Table creation failed: {e}",
+            ) from e
+        except Exception as e:
+            logger.error("Unexpected error creating tables: %s", e)
+            raise DatabaseException(
+                error_code="TABLE_CREATION_UNEXPECTED_ERROR",
+                message=f"Unexpected table creation error: {e}",
             ) from e
 
     async def drop_tables(self) -> None:
