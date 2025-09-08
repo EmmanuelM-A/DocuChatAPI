@@ -14,8 +14,9 @@ from sqlalchemy import create_engine
 from src.config.settings import settings
 from src.database.connection.base_connection import DatabaseConnection
 from src.database.connection.db_connection import PostgresConnection
-from src.database.migrations.alembic_env_template import ALEMBIC_ENV_TEMPLATE
-from src.database.migrations.alembic_ini_template import ALEMBIC_INI_TEMPLATE
+from src.database.migrations.templates.alembic_env_template import ALEMBIC_ENV_TEMPLATE
+from src.database.migrations.templates.alembic_ini_template import ALEMBIC_INI_TEMPLATE
+from src.database.migrations.templates.script_template import SCRIPT_TEMPLATE
 
 from src.logger.default_logger import logger
 from src.utils.api_exceptions import DatabaseException
@@ -81,7 +82,7 @@ class MigrationManager:
             self._alembic_cfg.set_main_option("file_template", file_template)
 
             # Set timezone
-            self._alembic_cfg.set_main_option("timezone", "UTC")
+            # self._alembic_cfg.set_main_option("timezone", "UTC")
 
         return self._alembic_cfg
 
@@ -152,7 +153,7 @@ class MigrationManager:
             # Get the actual revision ID
             revision_id = script_dir.get_current_head()
 
-            logger.debug("Migration created: %s (revision: %s)", message, revision_id)
+            logger.info("Migration created: %s (revision: %s)", message, revision_id)
 
             return revision_id
         except Exception as e:
@@ -355,12 +356,24 @@ class MigrationSetup:
                 with open(env_file, "w", encoding="utf-8") as f:
                     f.write(ALEMBIC_ENV_TEMPLATE)
 
+            logger.info("The alembic env file '.env.py' has been created")
+
             # Create alembic.ini in project root
             project_root = Path.cwd()
             alembic_ini = project_root / "alembic.ini"
             if not alembic_ini.exists():
                 with open(alembic_ini, "w", encoding="utf-8") as f:
                     f.write(ALEMBIC_INI_TEMPLATE)
+
+            logger.info("The alembic ini file 'alembic.ini' has been created")
+
+            # Create script.py.mako if it doesn't exist
+            script_template = self._migrations_path / "script.py.mako"
+            if not script_template.exists():
+                with open(script_template, "w", encoding="utf-8") as f:
+                    f.write(SCRIPT_TEMPLATE)
+
+            logger.info("The alembic script file 'script.py.mako' has been created")
 
             logger.info(f"Migration infrastructure set up at {self._migrations_path}")
 

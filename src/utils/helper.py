@@ -2,6 +2,8 @@
 This module provides utility classes for common application-wide functionality.
 """
 
+from typing import Any, Coroutine
+
 import bcrypt
 
 
@@ -9,7 +11,7 @@ class Cryptography:
     """Handles all operations that involved with cryptography"""
 
     @staticmethod
-    async def hash_password(password: str) -> bytes:
+    async def hash_password(password: str) -> str:
         """
         Hashes a plain-text password using bcrypt with a generated salt.
 
@@ -22,7 +24,7 @@ class Cryptography:
 
         SALT_ROUNDS = 12
         salt = bcrypt.gensalt(SALT_ROUNDS)
-        return bcrypt.hashpw(password.encode("utf-8"), salt)
+        return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
     @staticmethod
     async def verify_password(password: str, hashed_password: bytes) -> bool:

@@ -293,11 +293,13 @@ class DatabaseSeeder:
                 logger.info("Test user %s already exists", email)
                 return
 
+            hashed_password = await Cryptography.hash_password(password)
+
             # Create test user
             test_user = User(
                 username=username,
                 email=email,
-                hashed_password=Cryptography.hash_password(password).decode("utf-8"),
+                hashed_password=hashed_password,
                 plan_id=plan_id,
                 email_verified=True,
                 is_active=True,

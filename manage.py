@@ -6,16 +6,18 @@ Provides developer-friendly commands for database setup, migrations,
 and other project utilities.
 """
 
+# TODO: USE LOGGING INSTEAD OF PRINTS
+
 import sys
 import asyncio
 from pathlib import Path
 import argparse
 
+from src.scripts.setup_database import DatabaseSetupOrchestrator
+
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
-
-from src.scripts.setup_database import DatabaseSetupOrchestrator
 
 
 def main():

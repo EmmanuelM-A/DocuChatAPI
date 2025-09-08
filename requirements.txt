@@ -8,8 +8,10 @@ slowapi~=0.1.9
 asyncpg~=0.30.0
 pytest~=8.3.5
 SQLAlchemy~=2.0.43
-passlib~=1.7.4
 alembic~=1.13.0
 bcrypt~=4.3.0
-greenlet~=3.2.3
-psycopg2-binary~=2.9.9
+
+asyncio~=4.0.0
+argparse~=1.4.0
+uliweb-alembic~=0.6.9
+nest-asyncio~=1.6.0
