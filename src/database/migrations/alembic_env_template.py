@@ -23,8 +23,11 @@ from alembic import context
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, project_root)
 
-# Import models for autogenerate support
+# Import models for autogenerate support TODO: REMEMBER TO ADD THE REST OF THE MODELS
 from src.database.models.base_model import Base
+from src.database.models.user_model import User
+from src.database.models.plan_model import Plan
+from src.database.models.chat_session_model import ChatSession
 from src.config.settings import settings
 
 # Alembic Config object
