@@ -530,6 +530,18 @@ class ExportException(InternalServerException):
         )
 
 
+# class NetworkException(InternalServerException):
+#     """For external API/network failures"""
+#
+#
+# class ConfigurationException(InternalServerException):
+#     """For missing or invalid configuration"""
+# 
+#
+# class BusinessLogicException(BadRequestException):
+#     """For business rule violations"""
+
+
 class ValidationException(UnprocessableEntityException):
     """
     Used when request data fails validation rules or business logic checks.
