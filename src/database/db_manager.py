@@ -7,7 +7,6 @@ from typing import Optional, AsyncGenerator
 from contextlib import asynccontextmanager
 
 import bcrypt
-from passlib.context import CryptContext
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
@@ -65,8 +64,9 @@ class DatabaseEngine:
             self._is_initialized = False
 
             raise DatabaseException(
+                message="Database initialization failed.",
                 error_code="DB_INIT_FAILED",
-                message=f"Database initialization failed: {e}",
+                stack_trace=str(e),
             ) from e
 
     async def shutdown(self) -> None:
@@ -79,7 +79,14 @@ class DatabaseEngine:
             logger.info("Database engine shutdown completed")
         except Exception as e:
             logger.error("Error during database shutdown: %s", e)
-            raise
+            raise DatabaseException(
+                message="The database failed to shutdown",
+                error_code="DB_SHUTDOWN_ERROR",
+                stack_trace=str(e),
+            ) from e
+        # finally:
+        #     if not self._is_initialized: # TODO: LOOK INTO THIS
+        #         logger.info("Initiating second attempt at shutting down the database.")
 
     @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
@@ -99,8 +106,8 @@ class DatabaseEngine:
         """
         if not self._is_initialized:
             raise DatabaseException(
-                error_code="DB_ENGINE_NOT_INIT",
                 message="Database engine has not been initialized",
+                error_code="DB_ENGINE_NOT_INIT",
             )
 
         session = self._connection.get_session()
@@ -122,6 +129,7 @@ class DatabaseEngine:
             RuntimeError: If table creation fails
         """
         if not self._is_initialized:
+            logger.warning("Database has not been initialized yet. Initiating now...")
             await self.initialize()
 
         try:
@@ -131,14 +139,14 @@ class DatabaseEngine:
         except SQLAlchemyError as e:
             logger.error("Failed to create database tables: %s", e)
             raise DatabaseException(
-                error_code="TABLE_CREATION_FAILED",
                 message=f"Table creation failed: {e}",
+                error_code="TABLE_CREATION_FAILED",
             ) from e
         except Exception as e:
             logger.error("Unexpected error creating tables: %s", e)
             raise DatabaseException(
-                error_code="TABLE_CREATION_UNEXPECTED_ERROR",
                 message=f"Unexpected table creation error: {e}",
+                error_code="TABLE_CREATION_UNEXPECTED_ERROR",
             ) from e
 
     async def drop_tables(self) -> None:
@@ -168,7 +176,7 @@ class DatabaseEngine:
         except SQLAlchemyError as e:
             logger.error("Failed to drop database tables: %s", e)
             raise DatabaseException(
-                error_code="TABLE_DROP_FAILED", message=f"Table dropping failed: {e}"
+                message=f"Table dropping failed: {e}", error_code="TABLE_DROP_FAILED"
             ) from e
 
     async def health_check(self) -> bool:
@@ -254,8 +262,6 @@ class DatabaseSeeder:
             password: Plain password (will be hashed)
         """
 
-        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
         async with self._engine.get_session() as session:
             # Get free plan ID
             result = await session.execute(
@@ -308,7 +314,11 @@ class DatabaseSeeder:
             logger.info("Database seeding completed successfully")
         except Exception as e:
             logger.error("Database seeding failed: %s", e)
-            raise
+            raise DatabaseException(
+                message="An error occurred during database seeding",
+                error_code="DB_SEEDING_FAILED",
+                stack_trace=str(e),
+            ) from e
 
 
 class DatabaseManager:
@@ -361,8 +371,8 @@ class DatabaseManager:
             is_healthy = await self._engine.health_check()
             if not is_healthy:
                 raise DatabaseException(
-                    error_code="DB_HEALTH_CHECK_FAILED",
                     message="Database health check failed after setup",
+                    error_code="DB_HEALTH_CHECK_FAILED",
                 )
 
             logger.info("Database setup completed successfully")
@@ -370,7 +380,9 @@ class DatabaseManager:
         except Exception as e:
             logger.error("Database setup failed: %s", e)
             await self._engine.shutdown()
-            raise
+            raise DatabaseException(
+                message="Database setup failed", error_code="DB_SETUP_FAILED"
+            ) from e
 
     async def reset_database(self) -> None:
         """
@@ -398,7 +410,11 @@ class DatabaseManager:
 
         except Exception as e:
             logger.error("Database reset failed: %s", e)
-            raise
+            raise DatabaseException(
+                message="Databased failed to reset",
+                error_code="DB_RESET_FAILED",
+                stack_trace=str(e),
+            ) from e
 
     async def shutdown(self) -> None:
         """Gracefully shutdown the database manager."""

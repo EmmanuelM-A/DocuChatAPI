@@ -54,7 +54,7 @@ class PostgresConnection(DatabaseConnection):
         """
         if not self.session_maker:
             raise DatabaseException(
+                message="No session available because the database has not been connected",
                 error_code="NO_DB_CONNECTION_DETECTED",
-                message="Database not connected. Call connect() first.",
             )
         return self.session_maker()

@@ -92,7 +92,7 @@ class MigrationManager:
         This creates the alembic.ini file and versions directory structure.
 
         Raises:
-            DatabaseException: If alembic initialization
+            DatabaseException: If alembic initialization fails
         """
 
         try:
@@ -102,8 +102,9 @@ class MigrationManager:
         except Exception as e:
             logger.error("Failed to initialize Alembic: %s", e)
             raise DatabaseException(
+                message="Alembic initialization failed during migration",
                 error_code="ALEMBIC_INIT_FAILED",
-                message=f"Alembic initialization failed: {e}",
+                stack_trace=str(e),
             ) from e
 
     def create_migration(self, message: str, autogenerate: bool = True) -> str:
@@ -129,8 +130,9 @@ class MigrationManager:
         except Exception as e:
             logger.error("Failed to create migration: %s", e)
             raise DatabaseException(  # FIXME: CREATE __REPR__ FOR ERROR RESPONSE
+                message="Migration creation failed",
                 error_code="MIGRATION_CREATION_FAILED",
-                message=f"Migration creation failed: {e}",
+                stack_trace=str(e),
             ) from e
 
     def upgrade(self, revision: str = "head") -> None:
@@ -151,7 +153,9 @@ class MigrationManager:
         except Exception as e:
             logger.error("Failed to upgrade database: %s", e)
             raise DatabaseException(
-                error_code="DB_UPDATE_FAILED", message=f"Database upgrade failed:: {e}"
+                message="Database upgrade failed.",
+                error_code="DB_UPDATE_FAILED",
+                stack_trace=str(e),
             ) from e
 
     def downgrade(self, revision: str) -> None:
@@ -171,8 +175,9 @@ class MigrationManager:
         except Exception as e:
             logger.error("Failed to downgrade database: %s", str(e))
             raise DatabaseException(
+                message="Database downgrade failed.",
                 error_code="DB_DOWNGRADE_FAILED",
-                message=f"Database downgrade failed {e}",
+                stack_trace=str(e),
             ) from e
 
     def get_current_revision(self) -> Optional[str]:

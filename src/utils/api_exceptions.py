@@ -9,6 +9,7 @@ from fastapi import HTTPException, status
 from src.utils.api_responses import ErrorDetail
 
 
+# TODO: REMEMBER THAT YOU LOG ERRORS BEFORE YOU RAISE THEM AND THE EXC HANDLERS ALSO LOG ERRORS, SO DUPLICATE LOGS
 class ApiException(HTTPException):
     """
     Custom base error class for API errors/exceptions, providing a
@@ -536,7 +537,7 @@ class ExportException(InternalServerException):
 #
 # class ConfigurationException(InternalServerException):
 #     """For missing or invalid configuration"""
-# 
+#
 #
 # class BusinessLogicException(BadRequestException):
 #     """For business rule violations"""
