@@ -40,7 +40,7 @@ class Cryptography:
         return bcrypt.checkpw(password.encode("utf-8"), hashed_password)
 
 
-class Response:
+class Response:  # ResponseDelivery
     """
     Responsible for sending the http response objects to users using the standardized
     response format.

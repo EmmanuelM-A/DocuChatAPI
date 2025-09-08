@@ -45,7 +45,7 @@ class DatabaseSettings(BaseSettings):
     DB_POOL_SIZE: int = Field(default=10)
     DB_MAX_OVERFLOW: int = Field(default=20)
     DB_POOL_TIMEOUT: int = Field(default=30)
-    DB_ECHO: bool = Field(default=True)
+    DB_ECHO: bool = Field(default=False)
     DB_IS_POOL_PRE_PING_ENABLED: bool = Field(default=True)
 
     DB_MIGRATION_DIR: str = Field(default="src/database/migrations")

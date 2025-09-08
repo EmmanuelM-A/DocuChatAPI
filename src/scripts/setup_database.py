@@ -15,6 +15,9 @@ import argparse
 import sys
 from pathlib import Path
 
+from sqlalchemy import text
+
+from src.config.settings import settings
 from src.database.db_manager import DatabaseManager
 from src.database.migrations.migration_manager import MigrationManager, MigrationSetup
 from src.logger.default_logger import logger
@@ -130,29 +133,66 @@ class DatabaseSetupOrchestrator:
             raise
 
     async def show_status(self) -> None:
-        """
-        Display current database and migration status.
-        """
+        """Display comprehensive database and migration status."""
 
         try:
-            logger.info("Database Status:")
+            logger.info("=== Database Status ===")
 
             # Database health
             is_healthy = await self._db_manager.engine.health_check()
             logger.info(
-                "   Database Health: %s", "Healthy" if is_healthy else "Unhealthy"
+                "Database Health: %s", "✓ Healthy" if is_healthy else "✗ Unhealthy"
             )
 
+            # Connection info
+            db_url = str(settings.database.DATABASE_URL.get_secret_value())
+            # Mask password for security
+            masked_url = (
+                db_url.split("@")[0].split(":")[:-1] + ["***@"] + [db_url.split("@")[1]]
+            )
+            logger.info("Database URL: %s", "".join(masked_url))
+
+            # Table existence
+            if is_healthy:
+                async with self._db_manager.engine.get_session() as session:
+                    result = await session.execute(
+                        text(
+                            """
+                        SELECT table_name 
+                        FROM information_schema.tables 
+                        WHERE table_schema = 'public'
+                        ORDER BY table_name
+                    """
+                        )
+                    )
+                    tables = [row[0] for row in result.fetchall()]
+                    logger.info("Existing Tables: %s", tables if tables else "None")
+
             # Migration info
+            logger.info("\n=== Migration Status ===")
             migration_info = self._migration_manager.show_current_info()
+            current_rev = migration_info["current_revision"]
             logger.info(
-                "   Current Revision: %s", migration_info["current_revision"] or "None"
+                "Current Revision: %s", current_rev or "None (no migrations applied)"
             )
-            logger.info(
-                "   Pending Migrations: %s",
-                "Yes" if migration_info["has_pending_migrations"] else "No",
-            )
-            logger.info("   Migrations Path: %s", migration_info["migrations_path"])
+
+            has_pending = migration_info["has_pending_migrations"]
+            logger.info("Pending Migrations: %s", "Yes" if has_pending else "No")
+
+            # Migration history
+            history = self._migration_manager.get_migration_history()
+            if history:
+                logger.info("Recent Migrations:")
+                for migration in history[:5]:  # Show last 5
+                    status = "✓" if migration["revision"] == current_rev else " "
+                    logger.info(
+                        "  %s %s: %s",
+                        status,
+                        migration["revision"][:8],
+                        migration["message"],
+                    )
+
+            logger.info("Migrations Path: %s", migration_info["migrations_path"])
 
         except Exception as exc:
             logger.error("Failed to get status: %s", str(exc))

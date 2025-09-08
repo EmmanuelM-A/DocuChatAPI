@@ -2,6 +2,7 @@
 This module provides migration management using Alembic.
 """
 
+import fcntl
 from pathlib import Path
 from typing import Optional, List
 
@@ -38,7 +39,7 @@ class MigrationManager:
 
         self._connection = connection or PostgresConnection()
         self._alembic_cfg: Optional[Config] = None
-        self._migrations_path = settings.database.DB_MIGRATION_DIR
+        self._migrations_path = Path(settings.database.DB_MIGRATION_DIR)
 
     @staticmethod
     def _get_sync_database_url() -> str:
@@ -107,6 +108,22 @@ class MigrationManager:
                 stack_trace=str(e),
             ) from e
 
+    def _validate_migration_setup(self) -> None:
+        """Validate that migration infrastructure is properly set up."""
+
+        if not self._migrations_path.exists():
+            raise DatabaseException(
+                error_code="MIGRATION_DIR_NOT_FOUND",
+                message=f"Migration directory not found: {self._migrations_path}",
+            )
+
+        versions_path = self._migrations_path / "versions"
+        if not versions_path.exists():
+            raise DatabaseException(
+                error_code="VERSIONS_DIR_NOT_FOUND",
+                message=f"Versions directory not found: {versions_path}",
+            )
+
     def create_migration(self, message: str, autogenerate: bool = True) -> str:
         """
         Create a new migration file.
@@ -122,11 +139,23 @@ class MigrationManager:
             DatabaseException: If migration creation fails
         """
 
+        self._validate_migration_setup()
+
         try:
             config = self._get_alembic_config()
-            command.revision(config, message=message, autogenerate=autogenerate)
-            logger.debug("Migration created: %s", message)
-            return message
+
+            # Capture the revision ID properly
+            script_dir = ScriptDirectory.from_config(config)
+            revision = command.revision(
+                config, message=message, autogenerate=autogenerate
+            )
+
+            # Get the actual revision ID
+            revision_id = script_dir.get_current_head()
+
+            logger.debug("Migration created: %s (revision: %s)", message, revision_id)
+
+            return revision_id
         except Exception as e:
             logger.error("Failed to create migration: %s", e)
             raise DatabaseException(  # FIXME: CREATE __REPR__ FOR ERROR RESPONSE
@@ -289,18 +318,14 @@ class MigrationSetup:
     and directory structure within the existing project layout.
     """
 
-    def __init__(
-        self, migrations_path: Path = None, migration_manager: MigrationManager = None
-    ):
+    def __init__(self, migration_manager: MigrationManager = None):
         """
         Initialize the migration setup utility.
 
         Args:
-            migrations_path: Path where migrations will be stored
+            migration_manager: The instance of the MigrationManager
         """
-        self._migrations_path = migrations_path or Path(
-            settings.database.DB_MIGRATION_DIR
-        )
+        self._migrations_path = Path(settings.database.DB_MIGRATION_DIR)
         self._migration_manager = migration_manager
 
     def create_initial_migration(self) -> str:
@@ -315,41 +340,46 @@ class MigrationSetup:
 
     def setup_migration_infrastructure(self) -> None:
         """
-        Set up the complete migration infrastructure.
+        Sets up the complete migration infrastructure with proper file locking.
 
-        Creates necessary directories and configuration files.
+        It also creates the necessary directories and configuration files.
         """
-        # Create migrations directory
-        self._migrations_path.mkdir(parents=True, exist_ok=True)
-        versions_path = self._migrations_path / "versions"
-        versions_path.mkdir(exist_ok=True)
 
-        # Create __init__.py files
-        (self._migrations_path / "__init__.py").touch()
-        (versions_path / "__init__.py").touch()
+        lock_file = self._migrations_path.parent / ".setup.lock"
 
-        # Create env.py
-        env_file = self._migrations_path / "env.py"
-        if not env_file.exists():
-            with open(env_file, "w") as f:
-                f.write(ALEMBIC_ENV_TEMPLATE)
+        try:
+            with open(lock_file, "w", encoding="utf-8") as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
 
-        # Create alembic.ini in project root
-        project_root = Path.cwd()
-        alembic_ini = project_root / "alembic.ini"
-        if not alembic_ini.exists():
-            with open(alembic_ini, "w") as f:
-                f.write(ALEMBIC_INI_TEMPLATE)
+                # Create directories
+                self._migrations_path.mkdir(parents=True, exist_ok=True)
+                versions_path = self._migrations_path / "versions"
+                versions_path.mkdir(exist_ok=True)
 
-        logger.info(f"Migration infrastructure set up at {self._migrations_path}")
+                # Create files atomically
+                self._create_file_if_not_exists(
+                    self._migrations_path / "__init__.py", ""
+                )
+                self._create_file_if_not_exists(versions_path / "__init__.py", "")
+                self._create_file_if_not_exists(
+                    self._migrations_path / "env.py", ALEMBIC_ENV_TEMPLATE
+                )
+
+                project_root = Path.cwd()
+                alembic_ini = project_root / "alembic.ini"
+                self._create_file_if_not_exists(alembic_ini, ALEMBIC_INI_TEMPLATE)
+
+            logger.info(f"Migration infrastructure set up at {self._migrations_path}")
+        except BlockingIOError:
+            logger.info("Migration setup already in progress by another process")
+        finally:
+            if lock_file.exists():
+                lock_file.unlink()
 
     @staticmethod
-    def create_initial_migration() -> str:
-        """
-        Create the initial migration file.
-
-        Returns:
-            str: The revision ID of the initial migration
-        """
-        manager = MigrationManager()
-        return manager.create_migration("Initial database schema", autogenerate=True)
+    def _create_file_if_not_exists(file_path: Path, content: str) -> None:
+        """Atomically create a file if it doesn't exist."""
+        if not file_path.exists():
+            temp_file = file_path.with_suffix(".tmp")
+            temp_file.write_text(content)
+            temp_file.rename(file_path)

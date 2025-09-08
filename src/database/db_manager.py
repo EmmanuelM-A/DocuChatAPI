@@ -6,7 +6,6 @@ from decimal import Decimal
 from typing import Optional, AsyncGenerator
 from contextlib import asynccontextmanager
 
-import bcrypt
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,6 +18,7 @@ from src.database.connection.db_connection import PostgresConnection
 from src.database.models.base_model import Base
 from src.config.settings import settings
 from src.utils.api_exceptions import DatabaseException
+from src.utils.helper import Cryptography
 
 
 class DatabaseEngine:
@@ -164,9 +164,16 @@ class DatabaseEngine:
                 "Database safety enabled! If you wish to execute "
                 "operation, disable it and then enable again!"
             )
-            return
+            raise DatabaseException(
+                message="Drop all tables operation denied",
+                error_code="DB_SAFETY_ENABLED",
+                details="An attempt to delete all database tables was detected"
+                " whilst DB_SAFETY was still enabled. Please review action"
+                " before continuing any operations!",
+            )
 
         if not self._is_initialized:
+            logger.warning("Database has not been initialized yet. Initiating now...")
             await self.initialize()
 
         try:
@@ -290,9 +297,7 @@ class DatabaseSeeder:
             test_user = User(
                 username=username,
                 email=email,
-                hashed_password=bcrypt.hashpw(
-                    password.encode("utf-8"), bcrypt.gensalt()
-                ).decode("utf-8"),
+                hashed_password=Cryptography.hash_password(password).decode("utf-8"),
                 plan_id=plan_id,
                 email_verified=True,
                 is_active=True,

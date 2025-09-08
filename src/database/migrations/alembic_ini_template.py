@@ -36,7 +36,7 @@ line_length = 120
 # the output encoding used when revision files are written
 output_encoding = utf-8
 
-# Database URL (will be overridden by env.py from settings)
+# Database URL (placeholder - will be set dynamically by MigrationManager)
 sqlalchemy.url = postgresql+asyncpg://user:pass@localhost/db
 
 [post_write_hooks]
