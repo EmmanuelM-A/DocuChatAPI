@@ -2,7 +2,6 @@
 This module provides migration management using Alembic.
 """
 
-import fcntl
 from pathlib import Path
 from typing import Optional, List
 
@@ -339,42 +338,40 @@ class MigrationSetup:
         )
 
     def setup_migration_infrastructure(self) -> None:
-        """
-        Sets up the complete migration infrastructure with proper file locking.
-
-        It also creates the necessary directories and configuration files.
-        """
-
-        lock_file = self._migrations_path.parent / ".setup.lock"
-
+        """Set up the complete migration infrastructure."""
         try:
-            with open(lock_file, "w", encoding="utf-8") as f:
-                fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            # Create directories
+            self._migrations_path.mkdir(parents=True, exist_ok=True)
+            versions_path = self._migrations_path / "versions"
+            versions_path.mkdir(exist_ok=True)
 
-                # Create directories
-                self._migrations_path.mkdir(parents=True, exist_ok=True)
-                versions_path = self._migrations_path / "versions"
-                versions_path.mkdir(exist_ok=True)
+            # Create __init__.py files
+            (self._migrations_path / "__init__.py").touch()
+            (versions_path / "__init__.py").touch()
 
-                # Create files atomically
-                self._create_file_if_not_exists(
-                    self._migrations_path / "__init__.py", ""
-                )
-                self._create_file_if_not_exists(versions_path / "__init__.py", "")
-                self._create_file_if_not_exists(
-                    self._migrations_path / "env.py", ALEMBIC_ENV_TEMPLATE
-                )
+            # Create env.py
+            env_file = self._migrations_path / "env.py"
+            if not env_file.exists():
+                with open(env_file, "w", encoding="utf-8") as f:
+                    f.write(ALEMBIC_ENV_TEMPLATE)
 
-                project_root = Path.cwd()
-                alembic_ini = project_root / "alembic.ini"
-                self._create_file_if_not_exists(alembic_ini, ALEMBIC_INI_TEMPLATE)
+            # Create alembic.ini in project root
+            project_root = Path.cwd()
+            alembic_ini = project_root / "alembic.ini"
+            if not alembic_ini.exists():
+                with open(alembic_ini, "w", encoding="utf-8") as f:
+                    f.write(ALEMBIC_INI_TEMPLATE)
 
             logger.info(f"Migration infrastructure set up at {self._migrations_path}")
-        except BlockingIOError:
-            logger.info("Migration setup already in progress by another process")
-        finally:
-            if lock_file.exists():
-                lock_file.unlink()
+
+        except Exception as e:
+            logger.error("Failed to setup migration infrastructure: %s", e)
+            raise DatabaseException(
+                message="An error occurred during the setting up of the migration "
+                "infrastructure.",
+                error_code="SETUP_MIGRATION_INFRA_FAILED",
+                stack_trace=str(e),
+            ) from e
 
     @staticmethod
     def _create_file_if_not_exists(file_path: Path, content: str) -> None:

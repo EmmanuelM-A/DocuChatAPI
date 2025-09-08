@@ -44,10 +44,8 @@ class DatabaseSetupOrchestrator:
     def __init__(self):
         """Initialize the setup orchestrator."""
         self._db_manager = DatabaseManager()
-        self._migration_manager = MigrationManager()
-        self._migration_setup = MigrationSetup(
-            migration_manager=self._migration_manager
-        )
+        self.migration_manager = MigrationManager()
+        self._migration_setup = MigrationSetup(migration_manager=self.migration_manager)
 
     async def setup_migrations_infrastructure(self) -> None:
         """
@@ -106,9 +104,9 @@ class DatabaseSetupOrchestrator:
             logger.info("Applying database migrations...")
 
             # Check if there are pending migrations
-            has_pending = self._migration_manager.check_pending_migrations()
+            has_pending = self.migration_manager.check_pending_migrations()
             if has_pending:
-                self._migration_manager.upgrade()
+                self.migration_manager.upgrade()
                 logger.info("Migrations applied successfully!")
             else:
                 logger.info("No pending migrations found!")
@@ -170,7 +168,7 @@ class DatabaseSetupOrchestrator:
 
             # Migration info
             logger.info("\n=== Migration Status ===")
-            migration_info = self._migration_manager.show_current_info()
+            migration_info = self.migration_manager.show_current_info()
             current_rev = migration_info["current_revision"]
             logger.info(
                 "Current Revision: %s", current_rev or "None (no migrations applied)"
@@ -180,7 +178,7 @@ class DatabaseSetupOrchestrator:
             logger.info("Pending Migrations: %s", "Yes" if has_pending else "No")
 
             # Migration history
-            history = self._migration_manager.get_migration_history()
+            history = self.migration_manager.get_migration_history()
             if history:
                 logger.info("Recent Migrations:")
                 for migration in history[:5]:  # Show last 5
