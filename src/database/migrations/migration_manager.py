@@ -354,7 +354,7 @@ class MigrationSetup:
                 with open(env_file, "w", encoding="utf-8") as f:
                     f.write(ALEMBIC_ENV_TEMPLATE)
 
-            logger.info("The alembic env file '.env.py' has been created")
+            logger.debug("The alembic env file '.env.py' has been created")
 
             # Create alembic.ini in project root
             project_root = Path.cwd()
@@ -363,7 +363,7 @@ class MigrationSetup:
                 with open(alembic_ini, "w", encoding="utf-8") as f:
                     f.write(ALEMBIC_INI_TEMPLATE)
 
-            logger.info("The alembic ini file 'alembic.ini' has been created")
+            logger.debug("The alembic ini file 'alembic.ini' has been created")
 
             # Create script.py.mako if it doesn't exist
             script_template = self._migrations_path / "script.py.mako"
@@ -371,7 +371,7 @@ class MigrationSetup:
                 with open(script_template, "w", encoding="utf-8") as f:
                     f.write(SCRIPT_TEMPLATE)
 
-            logger.info("The alembic script file 'script.py.mako' has been created")
+            logger.debug("The alembic script file 'script.py.mako' has been created")
 
             logger.info(f"Migration infrastructure set up at {self._migrations_path}")
 

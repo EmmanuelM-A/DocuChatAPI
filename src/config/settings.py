@@ -10,6 +10,8 @@ from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
+# TODO: SETUP/LINK ENV CONFIGS
+
 # ------------------------------------------------------------------
 # Load .env file explicitly
 # ------------------------------------------------------------------
@@ -166,7 +168,7 @@ class WebSearchSettings(BaseSettings):
 # Logging
 # ------------------------------------------------------------------
 class LoggingSettings(BaseSettings):
-    LOG_LEVEL: str = Field(default="INFO")
+    LOG_LEVEL: str = Field(default="DEBUG")
     LOG_DIRECTORY: str = Field(default="../../../logs")
     LOG_FORMAT: str = Field(default="%(asctime)s [%(levelname)s]: %(message)s")
     DATE_FORMAT: str = Field(default="%Y-%m-%dT%H:%M:%S")
