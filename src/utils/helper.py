@@ -42,7 +42,7 @@ class Cryptography:
         return bcrypt.checkpw(password.encode("utf-8"), hashed_password)
 
 
-class Response:  # ResponseDelivery
+class ResponseDelivery:
     """
     Responsible for sending the http response objects to users using the standardized
     response format.
@@ -67,3 +67,29 @@ class TokenUtil:
     @staticmethod
     async def verify_token(token, jwt_secret):
         """Verifies the token using the JWT_SECRET."""
+
+
+class GeneralUtil:
+    """General utility functions used throughout the application"""
+
+    @staticmethod
+    def mask_db_url(db_url) -> str:
+        """Censures the sensitive information found in a database url."""
+
+        try:
+            if "://" in db_url:
+                protocol, rest = db_url.split("://", 1)
+                if "@" in rest:
+                    credentials, host_part = rest.split("@", 1)
+
+                    if ":" in credentials:
+                        username = credentials.split(":")[0]
+                        return f"{protocol}://{username}:***@{host_part}"
+
+                    return f"{protocol}://***@{host_part}"
+                else:
+                    return db_url  # No credentials in URL
+            else:
+                return "***"  # Fallback for unexpected format
+        except Exception:
+            return "*** (URL format not recognized)"

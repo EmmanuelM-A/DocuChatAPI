@@ -2,8 +2,9 @@
 This module provides the database engine management and initialization.
 """
 
+import time
 from decimal import Decimal
-from typing import Optional, AsyncGenerator
+from typing import Optional, AsyncGenerator, Dict, Any
 from contextlib import asynccontextmanager
 
 from sqlalchemy import text
@@ -11,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.database.connection.base_connection import DatabaseConnection
+from src.database.migrations.migration_manager import MigrationManager
 from src.database.models.plan_model import Plan
 from src.database.models.user_model import User
 from src.logger.default_logger import logger
@@ -186,20 +188,113 @@ class DatabaseEngine:
                 message=f"Table dropping failed: {e}", error_code="TABLE_DROP_FAILED"
             ) from e
 
-    async def health_check(self) -> bool:
+    async def health_check(self) -> Dict[str, Any]:
         """
-        Perform a database health check.
+        Perform a comprehensive database health check.
 
         Returns:
-            bool: True if database is healthy, False otherwise
+            Dict containing detailed health information
         """
+        health_info = {
+            "healthy": False,
+            "timestamp": time.time(),
+            "checks": {},
+            "metrics": {},
+            "errors": [],
+        }
+
         try:
             async with self.get_session() as session:
-                await session.execute(text("SELECT 1"))
-            return True
+                start_time = time.time()
+
+                # Basic connectivity check
+                try:
+                    await session.execute(text("SELECT 1"))
+                    health_info["checks"]["connectivity"] = True
+                    query_time = time.time() - start_time
+                    health_info["metrics"]["query_response_time"] = query_time
+                except Exception as e:
+                    health_info["checks"]["connectivity"] = False
+                    health_info["errors"].append(f"Connectivity failed: {str(e)}")
+                    return health_info
+
+                # Check if core tables exist
+                try:
+                    result = await session.execute(
+                        text(
+                            """
+                            SELECT table_name 
+                            FROM information_schema.tables 
+                            WHERE table_schema = 'public' 
+                            AND table_name IN ('user', 'plan', 'chat_session')
+                            ORDER BY table_name
+                        """
+                        )
+                    )
+                    tables = [row[0] for row in result.fetchall()]
+                    health_info["checks"]["core_tables"] = len(tables) >= 3
+                    health_info["metrics"]["existing_tables"] = tables
+
+                    if len(tables) < 3:
+                        missing = set(["user", "plan", "chat_session"]) - set(
+                            tables
+                        )  # TODO: COME BACK TO THIS - ADD A LIST OF ALL TABLES/MODELS
+                        health_info["errors"].append(f"Missing tables: {missing}")
+
+                except Exception as e:
+                    health_info["checks"]["core_tables"] = False
+                    health_info["errors"].append(f"Table check failed: {str(e)}")
+
+                # Check migration status
+                try:
+                    migration_manager = (
+                        MigrationManager()
+                    )  # TODO: CONSIDER PASSING THIS IN INSTEAD
+                    current_rev = migration_manager.get_current_revision()
+                    has_pending = migration_manager.check_pending_migrations()
+
+                    health_info["checks"]["migrations_current"] = not has_pending
+                    health_info["metrics"]["current_revision"] = current_rev
+                    health_info["metrics"]["pending_migrations"] = has_pending
+
+                    if has_pending:
+                        health_info["errors"].append("Pending migrations detected")
+
+                except Exception as e:
+                    health_info["checks"]["migrations_current"] = False
+                    health_info["errors"].append(f"Migration check failed: {str(e)}")
+
+                # Check database size and basic metrics
+                try:
+                    result = await session.execute(
+                        text(
+                            """
+                            SELECT 
+                            pg_size_pretty(pg_database_size(current_database())) 
+                            as db_size, (SELECT count(*) FROM pg_stat_activity 
+                            WHERE state = 'active') as active_connections
+                            """
+                        )
+                    )
+                    row = result.fetchone()
+                    if row:
+                        health_info["metrics"]["database_size"] = row[0]
+                        health_info["metrics"]["active_connections"] = row[1]
+
+                except Exception as e:
+                    health_info["errors"].append(f"Metrics collection failed: {str(e)}")
+
+                # Overall health determination
+                critical_checks = ["connectivity", "core_tables"]
+                health_info["healthy"] = all(
+                    health_info["checks"].get(check, False) for check in critical_checks
+                )
+
         except Exception as e:
-            logger.error("Database health check failed: %s", e)
-            return False
+            health_info["errors"].append(f"Health check failed: {str(e)}")
+            health_info["healthy"] = False
+
+        return health_info
 
 
 # TODO: CHAT WITH THE DATA: https://claude.ai/chat/9c5fcad0-959b-4306-9dc6-8321369a7637
@@ -375,7 +470,9 @@ class DatabaseManager:
                 await self._seeder.seed_all()
 
             # Health check
-            is_healthy = await self._engine.health_check()
+            db_health_info = await self._engine.health_check()
+            is_healthy = db_health_info["healthy"]
+
             if not is_healthy:
                 raise DatabaseException(
                     message="Database health check failed after setup",

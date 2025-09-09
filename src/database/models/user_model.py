@@ -93,7 +93,7 @@ class User(Base):
         return email.lower()
 
     @validates("total_tokens_used")
-    def validate_tokens(self, key, tokens):
+    def validate_tokens(self, key, tokens):  # TODO: ADD BETTER VALIDATION
         """Ensure token count is non-negative"""
         if tokens < 0:
             raise ValueError("Token count cannot be negative")
