@@ -43,7 +43,7 @@ class MigrationManager:
 
     @staticmethod
     def _get_sync_database_url() -> str:
-        """Convert async database URL to sync for migrations."""
+        """Convert async database URL to a sync URL for migrations."""
 
         database_url = str(settings.database.DATABASE_URL.get_secret_value())
         if database_url.startswith("postgresql+asyncpg"):
@@ -51,7 +51,7 @@ class MigrationManager:
         return database_url
 
     def _get_sync_engine(self):  # TODO: CONSIDER USING THIS
-        """Creates the sync engine"""
+        """Creates the sync engine."""
 
         database_url = self._get_sync_database_url()
 
@@ -81,8 +81,7 @@ class MigrationManager:
             file_template = settings.database.DB_MIGRATION_FILE_TEMPLATE
             self._alembic_cfg.set_main_option("file_template", file_template)
 
-            # Set timezone
-            # self._alembic_cfg.set_main_option("timezone", "UTC")
+            logger.debug("A new alembic config has been created")
 
         return self._alembic_cfg
 
@@ -98,7 +97,9 @@ class MigrationManager:
 
         try:
             if not Path(self._migrations_path).exists():
-                command.init(str(self._migrations_path), "alembic")
+                config = self._get_alembic_config()
+                command.init(config, "alembic")
+
             logger.debug("Alembic initialized in %s", self._migrations_path)
         except Exception as e:
             logger.error("Failed to initialize Alembic: %s", e)
@@ -158,7 +159,7 @@ class MigrationManager:
             return revision_id
         except Exception as e:
             logger.error("Failed to create migration: %s", e)
-            raise DatabaseException(  # FIXME: CREATE __REPR__ FOR ERROR RESPONSE
+            raise DatabaseException(
                 message="Migration creation failed",
                 error_code="MIGRATION_CREATION_FAILED",
                 stack_trace=str(e),
@@ -178,7 +179,7 @@ class MigrationManager:
         try:
             config = self._get_alembic_config()
             command.upgrade(config, revision)
-            logger.debug("Database upgraded to revision: %s", revision)
+            logger.info("Database upgraded to revision: %s", revision)
         except Exception as e:
             logger.error("Failed to upgrade database: %s", e)
             raise DatabaseException(
@@ -200,7 +201,7 @@ class MigrationManager:
         try:
             config = self._get_alembic_config()
             command.downgrade(config, revision)
-            logger.debug("Database downgraded to revision: %s", revision)
+            logger.info("Database downgraded to revision: %s", revision)
         except Exception as e:
             logger.error("Failed to downgrade database: %s", str(e))
             raise DatabaseException(
@@ -220,14 +221,12 @@ class MigrationManager:
             config = self._get_alembic_config()
             script_dir = ScriptDirectory.from_config(config)
 
-            database_url = self._get_sync_database_url()
-
-            sync_engine = create_engine(database_url)
+            sync_engine = self._get_sync_engine()
 
             with sync_engine.connect() as conn:
                 context = MigrationContext.configure(conn)
+                logger.info("Current database revision retrieved")
                 return context.get_current_revision()
-
         except Exception as e:
             logger.error("Failed to get current revision: %s", str(e))
             return None
@@ -274,8 +273,7 @@ class MigrationManager:
             script_dir = ScriptDirectory.from_config(config)
 
             # Use sync engine for migration checks
-            database_url = self._get_sync_database_url()
-            sync_engine = create_engine(database_url)
+            sync_engine = self._get_sync_engine()
 
             with sync_engine.connect() as conn:
                 context = MigrationContext.configure(conn)
