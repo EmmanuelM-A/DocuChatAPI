@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 # Load .env file explicitly
 # ------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-ENV_FILE = PROJECT_ROOT / ".env"
+ENV_FILE = PROJECT_ROOT / ".env.dev"
 
 if ENV_FILE.exists():
     load_dotenv(ENV_FILE)
@@ -28,7 +28,6 @@ if ENV_FILE.exists():
 class CoreAppSettings(BaseSettings):
     ENV: str = Field(default="development", env="ENV")
     APP_NAME: str = Field(default="DocuChatAPI")
-    DEBUG_ENABLED: bool = Field(default=True)
 
     model_config = SettingsConfigDict(env_file=ENV_FILE, extra="ignore")
 
@@ -37,7 +36,10 @@ class CoreAppSettings(BaseSettings):
 # Database Settings
 # ------------------------------------------------------------------
 class DatabaseSettings(BaseSettings):
-    DATABASE_URL: SecretStr = Field(default=..., env="DATABASE_URL")
+    DATABASE_URL: SecretStr = Field(
+        default=f"postgresql+asyncpg://docu_chat:secret@localhost:5500/docu_chat_postgres",
+        env="DATABASE_URL",
+    )
     DB_HOST: str = Field(default="localhost", env="DB_HOST")
     DB_PORT: int = Field(default=5432, env="DB_PORT")
     DB_NAME: str = Field(default="docu_chat", env="DB_NAME")
