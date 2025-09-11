@@ -28,7 +28,7 @@ class LogFormat(BaseModel):
 class DatabaseLogFormat(LogFormat):
     """Base pydantic model for all database and database related logs"""
 
-    db_action: Optional[str] = Field(
+    action: Optional[str] = Field(
         default=None,
         description="The action performed on the database (e.g., connect, query, migrate).",
     )

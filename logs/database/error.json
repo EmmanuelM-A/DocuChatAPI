@@ -1,0 +1,20 @@
+{
+    "timestamp": "2025-09-11T23:52:45.918189Z",
+    "level": "ERROR",
+    "message": "Error log entry",
+    "db_action": null,
+    "additional": null,
+    "source_file": null,
+    "exception": null,
+    "traceback": null
+}
+{
+    "timestamp": "2025-09-11T23:54:29.102867Z",
+    "level": "ERROR",
+    "message": "Error log entry",
+    "action": null,
+    "additional": null,
+    "source_file": null,
+    "exception": null,
+    "traceback": null
+}

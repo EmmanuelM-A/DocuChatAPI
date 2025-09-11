@@ -27,7 +27,8 @@ class ColorFormatter(logging.Formatter):
         color = self.COLORS.get(record.levelno, self.RESET)
         return f"{color}{super().format(record)}{self.RESET}"
 
-def __get_log_level(level: LogLevel) -> int:
+
+def get_log_level(level: LogLevel) -> int:
     """
     Converts the log level string into its numerical counterpart.
     """
@@ -62,16 +63,20 @@ def get_logger(
 
     default_logger = logging.getLogger(name)
 
-    log_level = __get_log_level(settings.logging.LOG_LEVEL)
+    log_level = get_log_level(settings.logging.LOG_LEVEL)
     default_logger.setLevel(log_level)
+
+    # Avoid duplicate handlers
+    if default_logger.handlers:
+        return default_logger
 
     # Create formatters
     file_formatter = logging.Formatter(
-        fmt=settings.logging.LOG_FORMAT,
+        fmt=settings.logging.CONSOLE_LOG_FORMAT,
         datefmt=settings.logging.DATE_FORMAT,
     )
     console_formatter = ColorFormatter(
-        fmt=settings.logging.LOG_FORMAT,
+        fmt=settings.logging.CONSOLE_LOG_FORMAT,
         datefmt=settings.logging.DATE_FORMAT,
     )
 
@@ -110,3 +115,7 @@ def get_logger(
 
 
 logger = get_logger(__name__)
+
+
+if __name__ == "__main__":
+    logger.info("HELLO WORLD")
