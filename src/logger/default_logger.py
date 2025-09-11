@@ -5,9 +5,11 @@ Logger utility for the application with colorized console output.
 import logging
 import os
 import sys
+from enum import Enum
 from typing import Optional
 
 from src.config.settings import settings
+from src.logger.logging_utils import LogLevel
 
 
 class ColorFormatter(logging.Formatter):
@@ -28,19 +30,19 @@ class ColorFormatter(logging.Formatter):
         return f"{color}{formatted_msg}{self.RESET}"
 
 
-def __get_log_level(level: str) -> int:
+def __get_log_level(level: LogLevel) -> int:
     """
     Converts the log level string into its numerical counterpart.
     """
 
     level_mappings = {
-        "CRITICAL": 50,
-        "FATAL": 50,
-        "ERROR": 40,
-        "WARNING": 30,
-        "WARN": 30,
-        "INFO": 20,
-        "DEBUG": 10,
+        LogLevel.CRITICAL: 50,
+        LogLevel.FATAL: 50,
+        LogLevel.ERROR: 40,
+        LogLevel.WARNING: 30,
+        LogLevel.WARN: 30,
+        LogLevel.INFO: 20,
+        LogLevel.DEBUG: 10,
     }
 
     return level_mappings.get(level.upper(), 20)
@@ -108,5 +110,6 @@ def get_logger(
         default_logger.addHandler(console_handler)
 
     return default_logger
+
 
 logger = get_logger(__name__)
