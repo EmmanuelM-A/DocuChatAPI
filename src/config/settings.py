@@ -10,6 +10,8 @@ from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
+from src.logger.logging_utils import LogLevel
+
 # TODO: SETUP/LINK ENV CONFIGS
 
 # ------------------------------------------------------------------
@@ -40,6 +42,7 @@ class DatabaseSettings(BaseSettings):
         default=f"postgresql+asyncpg://docu_chat:secret@localhost:5500/docu_chat_postgres",
         env="DATABASE_URL",
     )
+    DB_LOG_DIR: str = Field(default="../../logs/database")
     DB_HOST: str = Field(default="localhost", env="DB_HOST")
     DB_PORT: int = Field(default=5432, env="DB_PORT")
     DB_NAME: str = Field(default="docu_chat", env="DB_NAME")
@@ -170,9 +173,9 @@ class WebSearchSettings(BaseSettings):
 # Logging
 # ------------------------------------------------------------------
 class LoggingSettings(BaseSettings):
-    LOG_LEVEL: str = Field(default="DEBUG")
+    LOG_LEVEL: str = Field(default=LogLevel.DEBUG)
     LOG_DIRECTORY: str = Field(default="../../../logs")
-    LOG_FORMAT: str = Field(default="%(asctime)s [%(levelname)s]: %(message)s")
+    CONSOLE_LOG_FORMAT: str = Field(default="%(asctime)s [%(levelname)s]: %(message)s")
     DATE_FORMAT: str = Field(default="%Y-%m-%dT%H:%M:%S")
     IS_FILE_LOGGING_ENABLED: bool = Field(default=False)
     LOG_MAX_BYTES: int = Field(default=10485760)

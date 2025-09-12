@@ -34,6 +34,11 @@ class JSONFormatter(logging.Formatter):
             "level": record.levelname,
             "message": record.getMessage(),
         }
+
+        for key, value in record.__dict__.items():
+            if key not in log_dict and not key.startswith("_"):
+                log_dict[key] = value
+
         structured = self.model(**log_dict)
         return structured.model_dump_json(indent=4)
 
@@ -74,7 +79,7 @@ def get_logger(name: str, model: Type[BaseModel]) -> logging.Logger:
 
         # File output → structured JSON
         file_handler = logging.FileHandler(
-            os.path.join(log_dir, "app.json"), encoding="utf-8"
+            os.path.join(log_dir, "app.log"), encoding="utf-8"
         )
         file_handler.setLevel(log_level)
         file_handler.setFormatter(file_formatter)
@@ -82,7 +87,7 @@ def get_logger(name: str, model: Type[BaseModel]) -> logging.Logger:
 
         # Error file → errors only, structured JSON
         error_handler = logging.FileHandler(
-            os.path.join(log_dir, "error.json"), encoding="utf-8"
+            os.path.join(log_dir, "error.log"), encoding="utf-8"
         )
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(file_formatter)
@@ -95,11 +100,3 @@ def get_logger(name: str, model: Type[BaseModel]) -> logging.Logger:
         logger.addHandler(console_handler)
 
     return logger
-
-
-if __name__ == "__main__":
-    db_logger = get_logger("DB_STANDARD", model=DatabaseStandardLog)
-    db_logger.info("Standard log entry")
-
-    db_error_logger = get_logger("DB_ERROR", model=DatabaseErrorLog)
-    db_error_logger.error("Error log entry")
