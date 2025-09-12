@@ -224,7 +224,7 @@ class DatabaseEngine:
                         text(
                             """
                             SELECT table_name 
-                            FROM information_schema.tables 
+                            FROM information_schema.tables  
                             WHERE table_schema = 'public' 
                             AND table_name IN ('user', 'plan', 'chat_session')
                             ORDER BY table_name

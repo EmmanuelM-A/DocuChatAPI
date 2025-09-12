@@ -48,9 +48,10 @@ class MigrationManager:
         database_url = str(settings.database.DATABASE_URL.get_secret_value())
         if database_url.startswith("postgresql+asyncpg"):
             return database_url.replace("postgresql+asyncpg", "postgresql+psycopg2")
+
         return database_url
 
-    def _get_sync_engine(self):  # TODO: CONSIDER USING THIS
+    def _get_sync_engine(self):
         """Creates the sync engine."""
 
         database_url = self._get_sync_database_url()

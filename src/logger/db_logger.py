@@ -100,3 +100,8 @@ def get_logger(name: str, model: Type[BaseModel]) -> logging.Logger:
         logger.addHandler(console_handler)
 
     return logger
+
+
+logger = get_logger(__name__, model=DatabaseStandardLog)
+
+err_logger = get_logger(__name__, model=DatabaseErrorLog)

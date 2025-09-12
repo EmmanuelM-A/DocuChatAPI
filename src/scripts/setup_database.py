@@ -21,17 +21,11 @@ from src.config.settings import settings
 from src.database.db_manager import DatabaseManager
 from src.database.migrations.migration_manager import MigrationManager, MigrationSetup
 from src.logger.default_logger import logger
-from src.utils.helper import GeneralUtil
+from src.utils.helper import GeneralUtil, DatabaseUtil
 
 # Add project root to Python path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
-
-
-# TODO: Consider adding a manage.py style CLI wrapper (so instead of python
-#   scripts/setup_database.py you can just run python manage.py migrate,
-#   python manage.py resetdb)? This would make your project look even more
-#   polished on a CV.
 
 
 class DatabaseSetupOrchestrator:
@@ -219,48 +213,31 @@ class DatabaseSetupOrchestrator:
             if health_info["errors"]:
                 logger.info("  • Check database connection and configuration")
 
-    async def show_status(
-        self,
-    ) -> None:
+    async def show_status(self) -> None:
         """Display comprehensive database and migration status."""
 
         try:
-            logger.info("=== Database Health Check ===")
-
             # Get comprehensive health information
             health_info = await self._db_manager.engine.health_check()
 
-            # Overall health status
-            health_status = "HEALTHY" if health_info["healthy"] else "UNHEALTHY"
-            logger.info("Overall Status: %s", health_status)
+            # Database status
+            DatabaseUtil.is_database_healthy(health_info)
 
             # Show individual check results
-            if health_info["checks"]:
-                logger.info("\nHealth Checks:")
-                for check_name, status in health_info["checks"].items():
-                    status_icon = "✓" if status else "✗"
-                    check_display = check_name.replace("_", " ").title()
-                    logger.info("  %s %s", status_icon, check_display)
+            DatabaseUtil.log_health_checks(health_info)
 
-            self.__display_performance_metrics(health_info)
+            DatabaseUtil.log_performance_metrics(health_info)
 
-            # Show any errors encountered
-            if health_info["errors"]:
-                logger.warning("\nHealth Check Warnings/Errors:")
-                for error in health_info["errors"]:
-                    logger.warning("  ⚠ %s", error)
+            DatabaseUtil.log_errors_encountered(health_info)
 
             # Connection info (with password masking)
-            logger.info("\n=== Connection Information ===")
-            db_url = str(settings.database.DATABASE_URL.get_secret_value())
-            masked_url = GeneralUtil.mask_db_url(db_url)
+            DatabaseUtil.log_connection_data()
 
-            logger.info("Database URL: %s", masked_url)
-            logger.info("Pool Size: %d", settings.database.DB_POOL_SIZE)
-            logger.info("Max Overflow: %d", settings.database.DB_MAX_OVERFLOW)
+            DatabaseUtil.check_migration_status(health_info)
 
-            self.__display_migration_info(health_info)
+            DatabaseUtil.log_migration_info(health_info)
 
+            DatabaseUtil.verify_tables_exist(health_info)
         except Exception as exc:
             logger.warning("Failed to get status: %s", str(exc))
             # Fallback to basic status if comprehensive check fails
@@ -281,7 +258,7 @@ class DatabaseSetupOrchestrator:
 
         try:
             await self._db_manager.shutdown()
-            logger.info("Cleanup complete")
+            logger.info("Database cleanup completed")
         except Exception as exc:
             logger.error("Cleanup failed: %s", exc)
 
