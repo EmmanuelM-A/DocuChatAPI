@@ -13,7 +13,9 @@ import asyncio
 from pathlib import Path
 import argparse
 
+from src.logger.default_logger import logger
 from src.scripts.setup_database import DatabaseSetupOrchestrator
+from src.utils.api_exceptions import DatabaseException
 
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -74,73 +76,67 @@ def main():
 
     async def run():
         try:
-            if args.command == "db":
-                if args.db_command == "init":
-                    print("Initializing database and migration infrastructure...")
-                    await orchestrator.setup_migrations_infrastructure()
-                    await orchestrator.initialize_database()
-                    await orchestrator.create_initial_migration()
-                    print("Database initialization complete!")
+            if args.command != "db":
+                raise DatabaseException(
+                    message="Database command not recognized!",
+                    error_code="DB_CMD_NOT_FOUND",
+                )
 
-                elif args.db_command == "migrate":
-                    print(f"Creating new migration: {args.message}")
-                    await orchestrator.migration_manager.create_migration(args.message)
-                    print("Migration created successfully!")
+            if args.db_command == "init":
+                await orchestrator.setup_migrations_infrastructure()
+                await orchestrator.initialize_database()
+                await orchestrator.create_initial_migration()
+                logger.info("Database initialization complete!")
 
-                elif args.db_command == "upgrade":
-                    print(f"Upgrading database to: {args.revision}")
-                    await orchestrator.migration_manager.upgrade(args.revision)
-                    print("Database upgrade complete!")
+            elif args.db_command == "migrate":
+                await orchestrator.migration_manager.create_migration(args.message)
 
-                elif args.db_command == "downgrade":
-                    print(f"Downgrading database to: {args.revision}")
-                    await orchestrator.migration_manager.downgrade(args.revision)
-                    print("Database downgrade complete!")
+            elif args.db_command == "upgrade":
+                await orchestrator.migration_manager.upgrade(args.revision)
 
-                elif args.db_command == "status":
-                    print("Current database status:")
-                    await orchestrator.show_status()
+            elif args.db_command == "downgrade":
+                await orchestrator.migration_manager.downgrade(args.revision)
 
-                elif args.db_command == "history":
-                    print("Migration history:")
-                    history = orchestrator.migration_manager.get_migration_history()
-                    if not history:
-                        print("No migrations found.")
-                    else:
-                        current_rev = (
-                            orchestrator.migration_manager.get_current_revision()
-                        )
-                        for migration in history:
-                            status_mark = (
-                                "✓" if migration["revision"] == current_rev else " "
-                            )
-                            rev_short = (
-                                migration["revision"][:8]
-                                if migration["revision"]
-                                else "unknown"
-                            )
-                            print(
-                                f"  {status_mark} {rev_short}: {migration['message']}"
-                            )
+            elif args.db_command == "status":
+                await orchestrator.show_status()
 
-                elif args.db_command == "reset":
-                    if not args.confirm:
-                        print("ERROR: Database reset requires confirmation.")
-                        print("This will permanently delete ALL data in the database.")
-                        print("Use: python manage.py db reset --confirm")
-                        return
+            elif args.db_command == "history":
+                history = orchestrator.migration_manager.get_migration_history()
+                if not history:
+                    raise DatabaseException(
+                        message="No database migrations found!",
+                        error_code="NO_DB_MIGRATIONS",
+                    )
 
-                    print("WARNING: This will permanently delete ALL data!")
-                    user_input = input("Type 'DELETE ALL DATA' to confirm: ")
-                    if user_input == "DELETE ALL DATA":
-                        print("Resetting database...")
-                        await orchestrator.reset_database()
-                        print("Database reset complete!")
-                    else:
-                        print("Reset cancelled.")
+                current_rev = orchestrator.migration_manager.get_current_revision()
 
-        except Exception as e:
-            print(f"Error: {e}")
+                for migration in history:
+                    status_mark = "✓" if migration["revision"] == current_rev else " "
+                    rev_short = (
+                        migration["revision"][:8]
+                        if migration["revision"]
+                        else "unknown"
+                    )
+                    logger.info(f"{status_mark} {rev_short}: {migration['message']}")
+
+            elif args.db_command == "reset":
+                if not args.confirm:
+                    raise DatabaseException(
+                        message="No database reset confirmation provided",
+                        error_code="NO_DB_RESET_CONFIRMATION",
+                        details="Use: python manage.py db reset --confirm",
+                    )
+
+                user_input = input("Type 'DELETE-ALL-DATA' to confirm: ")
+                if user_input == "DELETE-ALL-DATA":
+                    await orchestrator.reset_database()
+                else:
+                    logger.info("Reset cancelled.")
+        except DatabaseException as exc:
+            logger.error(exc)
+            sys.exit(1)
+        except IOError as exc:
+            logger.error(exc)
             sys.exit(1)
         finally:
             await orchestrator.cleanup()

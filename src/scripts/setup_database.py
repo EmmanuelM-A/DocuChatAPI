@@ -48,9 +48,8 @@ class DatabaseSetupOrchestrator:
         """
 
         try:
-            logger.info("Setting up migration infrastructure...")
+            logger.debug("Setting up migration infrastructure...")
             self._migration_setup.setup_migration_infrastructure()
-            logger.info("Migration infrastructure setup complete!")
         except Exception as exc:
             logger.error("Migration setup failed: %s", exc)
             raise
@@ -64,9 +63,7 @@ class DatabaseSetupOrchestrator:
         """
 
         try:
-            logger.info("Initializing database...")
             await self._db_manager.setup_database(with_seed_data=with_seed_data)
-            logger.info("Database initialization complete!")
         except Exception as exc:
             logger.error("Database initialization failed: %s", str(exc))
             raise
@@ -77,7 +74,7 @@ class DatabaseSetupOrchestrator:
         """
 
         try:
-            logger.info("Creating initial migration...")
+            logger.debug("Creating initial migration...")
 
             # Ensure database connection is established
             await self._db_manager.engine.initialize()
@@ -87,7 +84,7 @@ class DatabaseSetupOrchestrator:
             logger.info("Initial migration created with revision ID: %s", revision_id)
 
         except Exception as exc:
-            logger.error("Initial migration creation failed: %s", exc)
+            logger.error(exc)
             raise
 
     async def apply_migrations(self) -> None:
@@ -124,94 +121,6 @@ class DatabaseSetupOrchestrator:
         except Exception as exc:
             logger.error("Database reset failed: %s", exc)
             raise
-
-    @staticmethod
-    def __display_performance_metrics(health_info):
-        """Display performance metrics"""
-
-        if health_info["metrics"]:
-            logger.info("\nDatabase Metrics:")
-            metrics = health_info["metrics"]
-
-            # Query response time
-            if "query_response_time" in metrics:
-                response_time = metrics["query_response_time"]
-                logger.info("  Query Response Time: %.3f seconds", response_time)
-
-            # Database size
-            if "database_size" in metrics:
-                logger.info("  Database Size: %s", metrics["database_size"])
-
-            # Active connections
-            if "active_connections" in metrics:
-                logger.info("  Active Connections: %d", metrics["active_connections"])
-
-            # Existing tables
-            if "existing_tables" in metrics:
-                tables = metrics["existing_tables"]
-                logger.info("  Tables Found: %s", tables if tables else "None")
-
-            # Current revision from health check
-            if "current_revision" in metrics:
-                current_rev = metrics["current_revision"]
-                logger.info("  Current Migration: %s", current_rev or "None")
-        else:
-            logger.warning("No performance metrics available")
-
-    def __display_migration_info(self, health_info):
-        """Display migration information"""
-
-        logger.info("\n=== Migration Status ===")
-
-        # Use health check data if available, fallback to migration manager
-        if "current_revision" in health_info.get("metrics", {}):
-            current_rev = health_info["metrics"]["current_revision"]
-            has_pending = health_info["metrics"].get("pending_migrations", False)
-        else:
-            # Fallback to original method
-            migration_info = self.migration_manager.show_current_info()
-            current_rev = migration_info["current_revision"]
-            has_pending = migration_info["has_pending_migrations"]
-
-        logger.info(
-            "Current Revision: %s", current_rev or "None (no migrations applied)"
-        )
-        logger.info("Pending Migrations: %s", "Yes" if has_pending else "No")
-
-        # Migration history
-        history = self.migration_manager.get_migration_history()
-        if history:
-            logger.info("Recent Migrations:")
-            for migration in history[:5]:  # Show last 5
-                status = "✓" if migration["revision"] == current_rev else " "
-                rev_display = (
-                    migration["revision"][:8] if migration["revision"] else "unknown"
-                )
-                logger.info("  %s %s: %s", status, rev_display, migration["message"])
-        else:
-            logger.info("No migrations found")
-
-        # Migration configuration
-        migration_info = self.migration_manager.show_current_info()
-        logger.info("Migrations Path: %s", migration_info["migrations_path"])
-
-        # Summary
-        logger.info("\n=== Summary ===")
-        if health_info["healthy"]:
-            logger.info("Database is operational and ready")
-        else:
-            logger.warning("⚠Database has issues that need attention")
-            logger.info("   Review the errors above and run appropriate fixes")
-
-        # Helpful commands
-        if has_pending or not health_info["healthy"]:
-            logger.info("\n=== Suggested Actions ===")
-            if has_pending:
-                logger.info("  • Apply pending migrations: python manage.py db upgrade")
-            if not health_info.get("checks", {}).get("core_tables", True):
-                logger.info("  • Initialize database: python manage.py db init")
-            if health_info["errors"]:
-                logger.info("  • Check database connection and configuration")
 
     async def show_status(self) -> None:
         """Display comprehensive database and migration status."""

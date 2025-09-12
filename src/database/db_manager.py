@@ -446,6 +446,24 @@ class DatabaseManager:
         """Get the database seeder instance."""
         return self._seeder
 
+    async def initialize_for_application(self) -> None:
+        """
+        Initialize database connection ONLY for application startup.
+        Does NOT create tables, run migrations, or seed data.
+        """
+
+        try:
+            logger.debug("Initializing database connection for application...")
+            await self._engine.initialize()
+            logger.info("Database connection established successfully")
+        except Exception as e:
+            logger.error("Application database initialization failed")
+            raise DatabaseException(
+                message="Failed to initialize database connection for application",
+                error_code="APP_DB_INIT_FAILED",
+                stack_trace=str(e),
+            ) from e
+
     async def setup_database(self, with_seed_data: bool = True) -> None:
         """
         Complete database setup including initialization, table creation, and seeding.
@@ -457,7 +475,7 @@ class DatabaseManager:
             RuntimeError: If setup fails at any stage
         """
         try:
-            logger.info("Starting database setup...")
+            logger.debug("Starting database setup...")
 
             # Initialize connection
             await self._engine.initialize()

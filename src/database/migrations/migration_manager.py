@@ -146,20 +146,19 @@ class MigrationManager:
         try:
             config = self._get_alembic_config()
 
-            # Capture the revision ID properly
-            script_dir = ScriptDirectory.from_config(config)
-            revision = command.revision(
+            # Create migration and capture returned script object
+            revision_script = command.revision(
                 config, message=message, autogenerate=autogenerate
             )
 
-            # Get the actual revision ID
-            revision_id = script_dir.get_current_head()
+            # Extract revision id directly from the script object
+            revision_id = revision_script.revision
 
             logger.info("Migration created: %s (revision: %s)", message, revision_id)
 
             return revision_id
         except Exception as e:
-            logger.error("Failed to create migration: %s", e)
+            logger.error(e)
             raise DatabaseException(
                 message="Migration creation failed",
                 error_code="MIGRATION_CREATION_FAILED",
