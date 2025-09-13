@@ -15,7 +15,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from src.database.db_manager import DatabaseManager
+from src.database.db_manager import DatabaseManager, get_database_manager
 from src.database.migrations.migration_manager import MigrationManager, MigrationSetup
 from src.logger.default_logger import logger
 from src.utils.helper import DatabaseUtil
@@ -34,9 +34,14 @@ class DatabaseSetupOrchestrator:
     and data seeding in the correct order.
     """
 
+    # TODO: DO FINAL DATABASE REVIEW AND CLEAN AND THEN COMPLETE TESTS
+
     def __init__(self):
         """Initialize the setup orchestrator."""
-        self._db_manager = DatabaseManager()
+        # self._db_manager = DatabaseManager()
+        self._db_manager = (
+            get_database_manager()
+        )  # TODO: FIGURE OUT WHY DB CONN NOT WORKING UPON SERVER RUN
         self.migration_manager = MigrationManager()
         self._migration_setup = MigrationSetup(migration_manager=self.migration_manager)
 
@@ -125,7 +130,7 @@ class DatabaseSetupOrchestrator:
 
         try:
             # Initialize database connection
-            await self._db_manager.initialize_for_application()
+            await self._db_manager.engine.initialize()
 
             # Get comprehensive health information
             health_info = await self._db_manager.engine.health_check()
