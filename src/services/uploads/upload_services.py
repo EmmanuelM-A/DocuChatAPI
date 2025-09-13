@@ -3,7 +3,6 @@ Responsible for all upload related operations.
 """
 
 # TODO: NORMALIZE AND REVIEW TABLES
-# TODO: SEPARATE USER TABLES INTO USER AND ACCOUNT
 
 
 class FileUploadService:

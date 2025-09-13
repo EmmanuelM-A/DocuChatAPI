@@ -30,7 +30,7 @@ Stores the plan data
 
 ### 🔐 `User`
 
-Stores user account information.
+Stores basic user (authentication) information.
 
 | Column              | Type         | Constraints                     | Purpose                   |
 |---------------------|--------------|---------------------------------|---------------------------|
@@ -38,13 +38,25 @@ Stores user account information.
 | `username`          | VARCHAR(50)  | Unique, Not Null                | Username for login        |
 | `email`             | VARCHAR(255) | Unique, Not Null                | Email for authentication  |
 | `hashed_password`   | VARCHAR(255) | Not Null                        | Securely stored password  |
-| `plan_id`           | UUID (FK)    | References `Plan(id)`, Not Null | Current subscription      |
-| `total_tokens_used` | BIGINT       | Default = 0                     | Lifetime token usage      |
-| `is_active`         | BOOLEAN      | Default = true                  | Account status            |
 | `email_verified`    | BOOLEAN      | Default = false                 | Email verification status |
-| `last_login_at`     | TIMESTAMP    | Nullable                        | Last successful login     |
 | `created_at`        | TIMESTAMP    | Default = now()                 | Account creation          |
 | `updated_at`        | TIMESTAMP    | Default = now()                 | Last modification         |
+
+### 🔐 `UserAccount`
+
+Stores the user's account information.
+
+| Column              | Type         | Constraints                             | Purpose                   |
+|---------------------|--------------|-----------------------------------------|---------------------------|
+| `id`                | UUID (PK)    | Primary Key                             | Unique identifier         |
+| `user_id`           | UUID (PK)    | References `User(id)` ON DELETE CASCADE | Account owner             |
+| `plan_id`           | UUID (FK)    | References `Plan(id)`, Not Null         | Current subscription      |
+| `total_tokens_used` | BIGINT       | Default = 0                             | Lifetime token usage      |
+| `is_active`         | BOOLEAN      | Default = true                          | Account status            |
+| `last_login_at`     | TIMESTAMP    | Nullable                                | Last successful login     |
+| `created_at`        | TIMESTAMP    | Default = now()                         | Account creation          |
+| `updated_at`        | TIMESTAMP    | Default = now()                         | Last modification         |
+
 
 ### 💬 `ChatSession`
 
