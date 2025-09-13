@@ -173,7 +173,7 @@ class WebSearchSettings(BaseSettings):
 # Logging
 # ------------------------------------------------------------------
 class LoggingSettings(BaseSettings):
-    LOG_LEVEL: str = Field(default=LogLevel.DEBUG)
+    LOG_LEVEL: str = Field(default=LogLevel.INFO)
     LOG_DIRECTORY: str = Field(default="../../../logs")
     CONSOLE_LOG_FORMAT: str = Field(default="%(asctime)s [%(levelname)s]: %(message)s")
     DATE_FORMAT: str = Field(default="%Y-%m-%dT%H:%M:%S")

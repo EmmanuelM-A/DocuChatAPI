@@ -105,6 +105,8 @@ class DatabaseUtil:
     def is_database_healthy(health_info: dict[str, Any]):
         """Determines if the database is healthy or not"""
 
+        logger.info(f"{"=" * 20} DATABASE HEALTH STATUS {"=" * 20}")
+
         health_status = "HEALTHY" if health_info["healthy"] else "UNHEALTHY"
 
         if health_info["healthy"]:
@@ -115,6 +117,8 @@ class DatabaseUtil:
     @staticmethod
     def log_health_checks(health_info: dict[str, Any]):
         """Displays all health checks"""
+
+        logger.info(f"{"=" * 20} DATABASE HEALTH CHECK {"=" * 20}")
 
         if health_info.get("checks"):
             for check_name, status in health_info["checks"].items():
@@ -129,6 +133,8 @@ class DatabaseUtil:
     @staticmethod
     def log_performance_metrics(health_info: dict[str, Any]):
         """Logs database performance metrics"""
+
+        logger.info(f"{"=" * 20} DATABASE PERFORMANCE METRICS {"=" * 20}")
 
         metrics = health_info.get("metrics", {})
 
@@ -152,6 +158,9 @@ class DatabaseUtil:
     @staticmethod
     def log_errors_encountered(health_info: dict[str, Any]):
         """Log any errors encountered during health checks"""
+
+        logger.info(f"{"=" * 20} DATABASE ERRORS {"=" * 20}")
+
         errors = health_info.get("errors", [])
 
         if errors:
@@ -164,6 +173,8 @@ class DatabaseUtil:
     def log_connection_data():
         """Log database connection information (with sensitive data masked)"""
 
+        logger.info(f"{"=" * 20} DATABASE CONNECTION INFO {"=" * 20}")
+
         db_url = str(settings.database.DATABASE_URL.get_secret_value())
         masked_url = DatabaseUtil.mask_db_url(db_url)
 
@@ -174,6 +185,8 @@ class DatabaseUtil:
     @staticmethod
     def check_migration_status(health_info: dict[str, Any]):
         """Check and log migration status"""
+
+        logger.info(f"{"=" * 20} DATABASE MIGRATION CHECK {"=" * 20}")
 
         metrics = health_info.get("metrics", {})
         current_revision = metrics.get("current_revision")
@@ -191,6 +204,8 @@ class DatabaseUtil:
     def log_migration_info(health_info: dict[str, Any]):
         """Log detailed migration information"""
 
+        logger.info(f"{"=" * 20} DATABASE MIGRATION INFO {"=" * 20}")
+
         metrics = health_info.get("metrics", {})
         current_revision = metrics.get("current_revision")
 
@@ -202,6 +217,8 @@ class DatabaseUtil:
     @staticmethod
     def verify_tables_exist(health_info: dict[str, Any]):
         """Verify that required tables exist in the database"""
+
+        logger.info(f"{"=" * 20} DATABASE TABLES CHECK {"=" * 20}")
 
         metrics = health_info.get("metrics", {})
         existing_tables = metrics.get("existing_tables", [])

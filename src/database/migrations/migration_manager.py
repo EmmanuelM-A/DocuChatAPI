@@ -84,6 +84,10 @@ class MigrationManager:
 
             logger.debug("A new alembic config has been created")
 
+            return self._alembic_cfg
+
+        logger.debug("Existing alembic config file found. Returning this...")
+
         return self._alembic_cfg
 
     def initialize_alembic(self) -> None:

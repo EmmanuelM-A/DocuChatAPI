@@ -6,6 +6,8 @@ from src.database.db_manager import get_database_manager
 from src.logger.default_logger import logger
 from src.utils.helper import DatabaseUtil
 
+# TODO: FIX MIGRATION AND DB CONNECTION ISSUES
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

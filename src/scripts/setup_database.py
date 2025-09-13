@@ -15,13 +15,11 @@ import argparse
 import sys
 from pathlib import Path
 
-from sqlalchemy import text
-
-from src.config.settings import settings
 from src.database.db_manager import DatabaseManager
 from src.database.migrations.migration_manager import MigrationManager, MigrationSetup
 from src.logger.default_logger import logger
-from src.utils.helper import GeneralUtil, DatabaseUtil
+from src.utils.helper import DatabaseUtil
+from src.utils.api_exceptions import DatabaseException
 
 # Add project root to Python path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -126,6 +124,9 @@ class DatabaseSetupOrchestrator:
         """Display comprehensive database and migration status."""
 
         try:
+            # Initialize database connection
+            await self._db_manager.initialize_for_application()
+
             # Get comprehensive health information
             health_info = await self._db_manager.engine.health_check()
 
@@ -147,6 +148,8 @@ class DatabaseSetupOrchestrator:
             DatabaseUtil.log_migration_info(health_info)
 
             DatabaseUtil.verify_tables_exist(health_info)
+        except DatabaseException as ex:
+            logger.error(ex)
         except Exception as exc:
             logger.warning("Failed to get status: %s", str(exc))
             # Fallback to basic status if comprehensive check fails

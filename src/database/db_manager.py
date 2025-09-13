@@ -86,9 +86,6 @@ class DatabaseEngine:
                 error_code="DB_SHUTDOWN_ERROR",
                 stack_trace=str(e),
             ) from e
-        # finally:
-        #     if not self._is_initialized: # TODO: LOOK INTO THIS
-        #         logger.info("Initiating second attempt at shutting down the database.")
 
     @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
@@ -258,7 +255,9 @@ class DatabaseEngine:
                     health_info["metrics"]["pending_migrations"] = has_pending
 
                     if has_pending:
-                        health_info["errors"].append("Pending migrations detected")
+                        health_info["errors"].append(
+                            "Pending migrations detected"
+                        )  # TODO: MOVE TO HEALTH CHECKS
 
                 except Exception as e:
                     health_info["checks"]["migrations_current"] = False
