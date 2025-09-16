@@ -72,11 +72,11 @@ def get_logger(
 
     # Create formatters
     file_formatter = logging.Formatter(
-        fmt=settings.logging.CONSOLE_LOG_FORMAT,
+        fmt=settings.logging.DEV_LOG_FORMAT,
         datefmt=settings.logging.DATE_FORMAT,
     )
     console_formatter = ColorFormatter(
-        fmt=settings.logging.CONSOLE_LOG_FORMAT,
+        fmt=settings.logging.DEV_LOG_FORMAT,
         datefmt=settings.logging.DATE_FORMAT,
     )
 
