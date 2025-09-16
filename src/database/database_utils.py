@@ -4,8 +4,12 @@ Stores utility functions and classes for database operations.
 
 from typing import Any
 
+from src.logger.default_logger import get_logger
 from src.config.settings import settings
-from src.logger.default_logger import logger
+
+# from src.logger.default_logger import logger
+
+logger = get_logger(__name__)
 
 
 class DatabaseUtil:

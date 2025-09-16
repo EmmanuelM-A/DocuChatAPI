@@ -55,7 +55,7 @@ class DatabaseSetupOrchestrator:
     async def initialize_database(self) -> None:
         """Initialize database connection and engine."""
         try:
-            await self._db_manager.initialize_for_application()
+            await self._db_manager.setup_database(with_seed_data=True)
             self._initialized = True
         except Exception as e:
             raise DatabaseException(
@@ -127,7 +127,7 @@ class DatabaseSetupOrchestrator:
                 stack_trace=str(e),
             ) from e
 
-    async def show_status(self) -> None:
+    async def database_health_check(self) -> None:
         """Display comprehensive database and migration status."""
 
         try:

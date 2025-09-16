@@ -10,6 +10,8 @@ import asyncio
 from pathlib import Path
 import argparse
 
+from src.database.database_utils import DatabaseUtil
+
 # from src.logger.default_logger import logger
 from src.logger.default_logger import get_logger
 from src.scripts.setup_database import DatabaseSetupOrchestrator
@@ -99,34 +101,32 @@ def main():
                 )
 
             if args.db_command == "init":
-                logger.info("Starting database initialization...")
                 await orchestrator.setup_migrations_infrastructure()
                 await orchestrator.initialize_database()
                 await orchestrator.create_initial_migration()
                 logger.info("✅ Database initialization complete!")
 
             elif args.db_command == "migrate":
-                logger.info("Creating new migration: %s", args.message)
-                revision_id = await orchestrator.migration_manager.create_migration(
-                    args.message
-                )
-                logger.info("✅ Migration created with revision ID: %s", revision_id)
+                orchestrator.migration_manager.create_migration(args.message)
+                logger.info("✅ Database migrations applied!")
 
             elif args.db_command == "upgrade":
-                logger.info("Upgrading database to revision: %s", args.revision)
-                await orchestrator.migration_manager.upgrade(args.revision)
+                orchestrator.migration_manager.upgrade(args.revision)
                 logger.info("✅ Database upgrade completed!")
 
             elif args.db_command == "downgrade":
-                logger.warning("⚠️  Downgrading database to revision: %s", args.revision)
-                await orchestrator.migration_manager.downgrade(args.revision)
+                orchestrator.migration_manager.downgrade(args.revision)
                 logger.info("✅ Database downgrade completed!")
 
             elif args.db_command == "status":
-                await orchestrator.show_status()
+                health_info = await orchestrator.db_manager.engine.health_check()
+
+                DatabaseUtil.is_database_healthy(health_info)
+                DatabaseUtil.check_migration_status(health_info)
 
             elif args.db_command == "history":
                 history = orchestrator.migration_manager.get_migration_history()
+
                 if not history:
                     logger.warning("No database migrations found!")
                     return exit_code
@@ -147,38 +147,11 @@ def main():
                     )
 
             elif args.db_command == "health":
-                logger.info("Performing database health check...")
-                health_info = await orchestrator.database_manager.engine.health_check()
-
-                logger.info("Health Check Results:")
-                logger.info("-" * 30)
-                logger.info(
-                    "Overall Health: %s",
-                    "✅ Healthy" if health_info["healthy"] else "❌ Unhealthy",
-                )
-
-                for check_name, status in health_info["checks"].items():
-                    status_icon = "✅" if status else "❌"
-                    logger.info(
-                        "%s %s: %s",
-                        status_icon,
-                        check_name.replace("_", " ").title(),
-                        status,
-                    )
-
-                if health_info["metrics"]:
-                    logger.info("\nMetrics:")
-                    for metric, value in health_info["metrics"].items():
-                        logger.info("  %s: %s", metric.replace("_", " ").title(), value)
-
-                if health_info["errors"]:
-                    logger.error("\nErrors:")
-                    for error in health_info["errors"]:
-                        logger.error("  - %s", error)
+                await orchestrator.database_health_check()
 
             elif args.db_command == "seed":
                 logger.info("Seeding database with initial data...")
-                seeder = orchestrator.database_manager.seeder
+                seeder = orchestrator.db_manager.seeder
 
                 if not args.skip_plans:
                     logger.info("Seeding subscription plans...")

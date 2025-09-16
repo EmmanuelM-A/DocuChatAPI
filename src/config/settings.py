@@ -55,7 +55,7 @@ class DatabaseSettings(BaseSettings):
     DB_ECHO: bool = Field(default=False)
     DB_IS_POOL_PRE_PING_ENABLED: bool = Field(default=True)
 
-    DB_MIGRATION_DIR: str = Field(default="src/database/migrations")
+    DB_MIGRATION_DIR: str = Field(default="../src/database/migrations")
     DB_MIGRATION_FILE_TEMPLATE: str = Field(
         default="%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s"
     )
@@ -173,10 +173,10 @@ class WebSearchSettings(BaseSettings):
 # Logging
 # ------------------------------------------------------------------
 class LoggingSettings(BaseSettings):
-    LOG_LEVEL: str = Field(default=LogLevel.INFO)
+    LOG_LEVEL: str = Field(default=LogLevel.DEBUG)
     LOG_DIRECTORY: str = Field(default="../../../logs")
     DEV_LOG_FORMAT: str = Field(
-        default="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        default="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s"
     )
     DATE_FORMAT: str = Field(default="%Y-%m-%dT%H:%M:%S")
     IS_FILE_LOGGING_ENABLED: bool = Field(default=False)

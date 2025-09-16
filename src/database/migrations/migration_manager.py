@@ -18,8 +18,12 @@ from src.database.migrations.templates.alembic_env_template import ALEMBIC_ENV_T
 from src.database.migrations.templates.alembic_ini_template import ALEMBIC_INI_TEMPLATE
 from src.database.migrations.templates.script_template import SCRIPT_TEMPLATE
 
-from src.logger.default_logger import logger
+# from src.logger.default_logger import logger
 from src.utils.api_exceptions import DatabaseException
+
+from src.logger.default_logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class MigrationManager:
@@ -72,6 +76,13 @@ class MigrationManager:
 
             # Set script location (where migrations are stored)
             script_location = str(self._migrations_path)
+
+            if not self._migrations_path.exists():
+                logger.warning(
+                    "Migrations path doesn't exist: %s. Run 'python manage.py db init' first.",
+                    self._migrations_path,
+                )
+
             self._alembic_cfg.set_main_option("script_location", script_location)
 
             # Set database URL

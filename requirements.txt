@@ -8,10 +8,9 @@ slowapi~=0.1.9
 asyncpg~=0.30.0
 pytest~=8.3.5
 SQLAlchemy~=2.0.43
-alembic~=1.13.0
 bcrypt~=4.3.0
 
 asyncio~=4.0.0
 argparse~=1.4.0
-uliweb-alembic~=0.6.9
+alembic~=1.14.1
 nest-asyncio~=1.6.0

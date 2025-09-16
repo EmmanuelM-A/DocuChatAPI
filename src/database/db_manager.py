@@ -15,12 +15,16 @@ from src.database.connection.base_connection import DatabaseConnection
 from src.database.migrations.migration_manager import MigrationManager
 from src.database.models.plan_model import Plan
 from src.database.models.user_model import User
-from src.logger.default_logger import logger
+
+# from src.logger.default_logger import logger
+from src.logger.default_logger import get_logger
 from src.database.connection.db_connection import PostgresConnection
 from src.database.models.base_model import Base
 from src.config.settings import settings
 from src.utils.api_exceptions import DatabaseException
 from src.utils.helper import Cryptography
+
+logger = get_logger(__name__)
 
 
 class DatabaseEngine:
@@ -192,6 +196,11 @@ class DatabaseEngine:
         Returns:
             Dict containing detailed health information
         """
+
+        if not self._is_initialized:
+            logger.warning("Database has not been initialized yet. Initiating now...")
+            await self.initialize()
+
         health_info = {
             "healthy": False,
             "timestamp": time.time(),
