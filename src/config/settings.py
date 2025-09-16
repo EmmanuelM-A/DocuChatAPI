@@ -175,7 +175,9 @@ class WebSearchSettings(BaseSettings):
 class LoggingSettings(BaseSettings):
     LOG_LEVEL: str = Field(default=LogLevel.INFO)
     LOG_DIRECTORY: str = Field(default="../../../logs")
-    DEV_LOG_FORMAT: str = Field(default="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    DEV_LOG_FORMAT: str = Field(
+        default="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
     DATE_FORMAT: str = Field(default="%Y-%m-%dT%H:%M:%S")
     IS_FILE_LOGGING_ENABLED: bool = Field(default=False)
     LOG_MAX_BYTES: int = Field(default=10485760)
