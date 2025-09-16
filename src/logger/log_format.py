@@ -16,13 +16,18 @@ class LogFormat(BaseModel):
     """The base format for all logs."""
 
     timestamp: dt.datetime = Field(
-        default_factory=lambda: dt.datetime.now(dt.timezone.utc),
+        # default_factory=lambda: dt.datetime.now(dt.timezone.utc),
+        default_factory=lambda: dt.datetime.now().astimezone(),
         description="UTC timestamp when the log was recorded.",
     )
 
     level: LogLevel = Field(description="The severity level of the log message.")
 
     message: str = Field(description="The descriptive message for the log event.")
+
+    source_file: Optional[str] = Field(
+        default=None, description="The file where the log originated."
+    )
 
 
 class DatabaseLogFormat(LogFormat):
@@ -44,10 +49,6 @@ class DatabaseStandardLog(DatabaseLogFormat):
 
 class DatabaseErrorLog(DatabaseLogFormat):
     """Pydantic model for all error/warning logs"""
-
-    source_file: Optional[str] = Field(
-        default=None, description="The file where the log originated."
-    )
 
     exception: Optional[str] = Field(
         default=None, description="Exception name if the log relates to an error."

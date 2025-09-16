@@ -254,6 +254,10 @@ settings = Settings()
 
 
 if __name__ == "__main__":
+    from src.logger.database_logger import DatabaseLogger
+
     db_url = settings.database.DATABASE_URL.get_secret_value()
 
-    print(db_url)
+    db_logger = DatabaseLogger(__file__)
+
+    db_logger.debug(message=db_url)

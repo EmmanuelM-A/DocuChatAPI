@@ -25,6 +25,8 @@ from src.logger.default_logger import get_logger
 
 logger = get_logger(__name__)
 
+# logger = DatabaseLogger(__name__)
+
 
 class MigrationManager:
     """
